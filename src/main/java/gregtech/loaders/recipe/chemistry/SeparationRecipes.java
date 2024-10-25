@@ -3,7 +3,6 @@ package gregtech.loaders.recipe.chemistry;
 import gregtech.api.GTValues;
 import gregtech.api.util.GTLog;
 import gregtech.api.util.GTUtility;
-import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.items.MetaItems;
 
 import net.minecraft.init.Blocks;
@@ -117,7 +116,7 @@ public class SeparationRecipes {
                 .buildAndRegister();
 
         CENTRIFUGE_RECIPES.recipeBuilder().duration(200).EUt(20)
-                .inputs(new ItemStack(MetaBlocks.RUBBER_LOG))
+                .inputs(new ItemStack(Blocks.LOG, 1, 3))
                 .chancedOutput(STICKY_RESIN, 5000, 1200)
                 .chancedOutput(PLANT_BALL, 3750, 900)
                 .chancedOutput(dust, Carbon, 2500, 600)

@@ -1,6 +1,7 @@
 {
-  "parent": "gregtech:item/material_sets/shiny/plate",
+  "parent": "item/generated",
   "textures": {
+    "layer0": "gregtech:items/material_sets/bright/plate",
     "layer1": "gregtech:items/material_sets/bright/plate_overlay"
   }
 }

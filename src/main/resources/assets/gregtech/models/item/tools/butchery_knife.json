@@ -2,6 +2,7 @@
   "parent": "item/handheld",
   "textures": {
     "layer0": "gregtech:items/tools/butchery_knife_base",
-    "layer1": "gregtech:items/tools/butchery_knife"
+    "layer1": "gregtech:items/tools/butchery_knife",
+    "layer2": "gregtech:items/tools/butchery_knife_overlay"
   }
 }

@@ -5,20 +5,17 @@ import gregtech.api.unification.OreDictUnifier;
 import gregtech.api.unification.material.Material;
 import gregtech.api.unification.material.properties.PropertyKey;
 import gregtech.api.unification.stack.UnificationEntry;
-import gregtech.api.util.GTLog;
 import gregtech.api.worldgen.config.OreConfigUtils;
 import gregtech.api.worldgen.config.OreDepositDefinition;
 import gregtech.api.worldgen.generator.GridEntryInfo;
 import gregtech.common.blocks.MetaBlocks;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -89,51 +86,13 @@ public class SurfaceRockPopulator implements VeinChunkPopulator {
     @Override
     public void populateChunk(World world, int chunkX, int chunkZ, Random random, OreDepositDefinition definition,
                               GridEntryInfo gridEntryInfo) {
-        int stonesCount = random.nextInt(2) + 1;
-        if (world.getWorldType() != WorldType.FLAT) {
-            if (!hasUndergroundMaterials(gridEntryInfo.getGeneratedBlocks(definition, chunkX, chunkZ))) {
-                return;
-            }
-
-            int baseX = chunkX * 16 + 8;
-            int baseZ = chunkZ * 16 + 8;
-
-            for (int i = 0; i < stonesCount; i++) {
-                int randomX = baseX + random.nextInt(8);
-                int randomZ = baseZ + random.nextInt(8);
-
-                generateSurfaceRock(world, new BlockPos(randomX, 0, randomZ));
-
-            }
-            // guarantee a surface rock in the center of the vein
-            generateSurfaceRock(world, gridEntryInfo.getCenterPos(definition));
-        }
-
-        // Log if all Surface Rock generation attempts were failed
-        if (failedGenerationCounter == stonesCount && world.getWorldType() != WorldType.FLAT) {
-            GTLog.logger.debug("Failed to generate surface rocks for vein {} at chunk with position: x: {}, z: {}",
-                    definition.getDepositName(), chunkX, chunkZ);
-        }
+        // Early return to prevent any population
+        return;
     }
 
     public void generateSurfaceRock(World world, BlockPos pos) {
-        BlockPos topBlockPos = findSpawnHeight(world, pos);
-        if (topBlockPos.getY() <= 20) { // don't generate below y20
-            return;
-        }
-        Block blockAtPos = world.getBlockState(topBlockPos).getBlock();
-
-        if (topBlockPos.getY() >= world.provider.getActualHeight()) {
-            return;
-        }
-        // Checks if the block is a replaceable feature like grass, snow layers, or Air. Liquids are replaceable, so
-        // exclude one deep liquid blocks, for looks
-        if (!blockAtPos.isReplaceable(world, topBlockPos) ||
-                world.getBlockState(topBlockPos).getMaterial().isLiquid()) {
-            return;
-        }
-
-        setStoneBlock(world, topBlockPos);
+        // Early return to prevent surface rock generation
+        return;
     }
 
     public Material getMaterial() {

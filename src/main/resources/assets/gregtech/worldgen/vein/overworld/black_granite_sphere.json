@@ -3,6 +3,7 @@
   "weight": 90,
   "priority": 100,
   "density": 1.0,
+  "max_height": 45,
   "min_height": 10,
   "count_as_vein": false,
   "generator": {

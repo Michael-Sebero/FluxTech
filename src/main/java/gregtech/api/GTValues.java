@@ -21,6 +21,11 @@ import static net.minecraft.util.text.TextFormatting.*;
 public class GTValues {
 
     /**
+     * Whether to ignore cable amperage limits when converting FE to EU
+     */
+    public static boolean ignoreCableAmperageLimit = false;
+
+    /**
      * <p/>
      * This is worth exactly one normal Item.
      * This Constant can be divided by many commonly used Numbers such as

@@ -48,18 +48,8 @@ public class FluidSpringPopulator implements VeinBufferPopulator {
     public void populateBlockBuffer(Random random, GridEntryInfo gridEntryInfo, IBlockModifierAccess modifier,
                                     OreDepositDefinition depositDefinition) {
         if (random.nextFloat() <= springGenerationChance) {
-            int groundLevel = gridEntryInfo.getTerrainHeight();
-            int springUndergroundHeight = groundLevel - gridEntryInfo.getCenterPos(depositDefinition).getY();
-            int springHeight = springUndergroundHeight + 6 + random.nextInt(3);
-            for (int i = 1; i <= springHeight; i++) {
-                modifier.setBlock(0, i, 0, 0);
-                if (i <= springUndergroundHeight) {
-                    modifier.setBlock(1, i, 0, 0);
-                    modifier.setBlock(-1, i, 0, 0);
-                    modifier.setBlock(0, i, 1, 0);
-                    modifier.setBlock(0, i, -1, 0);
-                }
-            }
+            // Only place a single fluid source block at the vein position
+            modifier.setBlock(0, 0, 0, 0);
         }
     }
 

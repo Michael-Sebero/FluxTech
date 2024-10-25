@@ -1108,17 +1108,17 @@ public class MachineRecipeLoader {
                 .buildAndRegister();
 
         EXTRACTOR_RECIPES.recipeBuilder().duration(300).EUt(2)
-                .inputs(new ItemStack(MetaBlocks.RUBBER_LEAVES, 16))
+                .inputs(new ItemStack(Blocks.LEAVES, 16, 3))
                 .output(dust, RawRubber)
                 .buildAndRegister();
 
         EXTRACTOR_RECIPES.recipeBuilder().duration(300).EUt(2)
-                .inputs(new ItemStack(MetaBlocks.RUBBER_LOG))
+                .inputs(new ItemStack(Blocks.LOG, 1, 3))
                 .output(dust, RawRubber)
                 .buildAndRegister();
 
         EXTRACTOR_RECIPES.recipeBuilder().duration(300).EUt(2)
-                .inputs(new ItemStack(MetaBlocks.RUBBER_SAPLING))
+                .inputs(new ItemStack(Blocks.SAPLING, 3, 3))
                 .output(dust, RawRubber)
                 .buildAndRegister();
 
