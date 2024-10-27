@@ -2491,10 +2491,10 @@ behavior.tricorder.debug_lag_count=Caused %s Lag Spike Warnings (anything taking
 behavior.tricorder.mte_owner=Owner: %s
 behavior.tricorder.mte_owner_offline=Owner is Offline or Offworld!
 behavior.tricorder.mte_owner_null=This wasn't placed by a player!
-behavior.tricorder.quantum_controller.usage=Using %s EU/t (%s)
+behavior.tricorder.quantum_controller.usage=Using %s RF/t (%s)
 behavior.tricorder.quantum_controller.connected_items=Connected item storages: %s
 behavior.tricorder.quantum_controller.connected_fluids=Connected fluid storages: %s
-behavior.tricorder.quantum_storage.usage=Contributing %s EU/t to Quantum Controller
+behavior.tricorder.quantum_storage.usage=Contributing %s RF/t to Quantum Controller
 
 metaitem.item_magnet.lv.name=Low Voltage Item Magnet
 metaitem.item_magnet.hv.name=High Voltage Item Magnet
@@ -4338,12 +4338,12 @@ gregtech.machine.energy_converter.max.4.name=MAX Energy Converter (4A)
 gregtech.machine.energy_converter.max.8.name=MAX Energy Converter (8A)
 gregtech.machine.energy_converter.max.16.name=MAX Energy Converter (16A)
 
-gregtech.machine.energy_converter.description=Converts Energy between RF and RF
+gregtech.machine.energy_converter.description=Converts Energy between RF and FE
 gregtech.machine.energy_converter.tooltip_tool_usage=Starts as §fFE Converter§7, use Soft Mallet to change
-gregtech.machine.energy_converter.tooltip_conversion_fe=§cForge Conversion: §f%,d RF -> %,dA %,d RF (%s§f)
-gregtech.machine.energy_converter.message_conversion_fe=Converting Forge Energy, In: %d RF, Out: %dA %d RF
-gregtech.machine.energy_converter.tooltip_conversion_eu=§aEU Conversion: §f%,dA %,d RF (%s§f) -> %,d RF
-gregtech.machine.energy_converter.message_conversion_eu=Converting RF, In: %dA %d RF, Out: %d RF
+gregtech.machine.energy_converter.tooltip_conversion_fe=§cForge Conversion: §f%,d FE -> %,dA %,d RF (%s§f)
+gregtech.machine.energy_converter.message_conversion_fe=Converting Forge Energy, In: %d FE, Out: %dA %d RF
+gregtech.machine.energy_converter.tooltip_conversion_eu=§aRF Conversion: §f%,dA %,d RF (%s§f) -> %,d FE
+gregtech.machine.energy_converter.message_conversion_eu=Converting RF, In: %dA %d RF, Out: %d FE
 
 # Pumps
 gregtech.machine.pump.tooltip=The best way to empty Oceans!
@@ -4623,7 +4623,7 @@ gregtech.advancement.low_voltage.21_machine_controller_cover.name=Manipulation
 gregtech.advancement.low_voltage.21_machine_controller_cover.desc=Get a Machine Controller.
 gregtech.advancement.low_voltage.22_lv_robot_arm.name=Complex Machines
 gregtech.advancement.low_voltage.22_lv_robot_arm.desc=Craft an LV Robot Arm.
-gregtech.advancement.low_voltage.23_lv_assembler.name=Avengers, Assemble!
+gregtech.advancement.low_voltage.23_lv_assembler.name=
 gregtech.advancement.low_voltage.23_lv_assembler.desc=Craft an LV Assembler.
 gregtech.advancement.low_voltage.24_smart_filter.name=Filter and Regulate
 gregtech.advancement.low_voltage.24_smart_filter.desc=Get a Smart Filter.
@@ -5436,7 +5436,7 @@ gregtech.chance_logic.xor=XOR
 gregtech.chance_logic.none=NONE
 gregtech.recipe.temperature=Temperature: %,dK (%s)
 gregtech.recipe.explosive=Explosive: %s
-gregtech.recipe.eu_to_start=Energy To Start: %sEU
+gregtech.recipe.eu_to_start=Energy To Start: %sRF
 gregtech.recipe.dimensions=Dimensions: %s
 gregtech.recipe.dimensions_blocked=Blocked Dimensions: %s
 gregtech.recipe.cleanroom=Requires %s
@@ -6046,7 +6046,7 @@ terminal.hardware.remove.full=There are no empty slots in inventory
 terminal.hardware.tip.remove=§4right-click remove the hardware
 
 terminal.battery.description=Battery manager, visually analyze your app's energy consumption.
-terminal.battery.hover=%s: Usage %d eu/s
+terminal.battery.hover=%s: Usage %d FE/s
 terminal.battery.low_energy=Low power! Plz recharge the terminal.
 
 terminal.store.description=App store, check out what you got? Install and upgrade the app.

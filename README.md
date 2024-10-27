@@ -22,8 +22,6 @@ This mod is about **technology** and **progression**.
 
 A typical GregTech facility features large arrays of both single- and multi-block machines processing numerous resources, creating even more complex materials which will be used in machines of higher tiers.
 
-All of which are powered by GTCEu's own power systems, featuring generators from simple wood burning for steam to plasma-powered turbines.
-
 ### Project Goal
 To improve the aesthetics of GregTech and improve universality with other mods which use different power systems.
 
@@ -36,5 +34,5 @@ cd /home/$USER/FluxTech/
  
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk/
  
-gradlew build
+./gradlew build
 ```

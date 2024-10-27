@@ -4309,10 +4309,10 @@ gregtech.machine.energy_converter.max.16.name=16安§c§lMAX§r能量转换器
 
 gregtech.machine.energy_converter.description=转换能量形式，支持EU与FE互换。
 gregtech.machine.energy_converter.tooltip_tool_usage=默认为§fFE转EU§7，手持软锤右击以切换模式
-gregtech.machine.energy_converter.tooltip_conversion_fe=§cFE 转 RF：§f%,d RF -> %,dA %,d RF（%s§f）
-gregtech.machine.energy_converter.message_conversion_fe=RF 转为 RF，输入：%d RF，输出：%dA %d RF
-gregtech.machine.energy_converter.tooltip_conversion_eu=§aEU 转 RF：§f%,dA %,d RF（%s§f）-> %,d RF
-gregtech.machine.energy_converter.message_conversion_eu=RF 转为 RF，输入：%dA %d RF，输出：%d RF
+gregtech.machine.energy_converter.tooltip_conversion_fe=§cFE 转 RF：§f%,d FE -> %,dA %,d RF（%s§f）
+gregtech.machine.energy_converter.message_conversion_fe=FE 转为 RF，输入：%d FE，输出：%dA %d RF
+gregtech.machine.energy_converter.tooltip_conversion_eu=§aEU 转 FE：§f%,dA %,d RF（%s§f）-> %,d FE
+gregtech.machine.energy_converter.message_conversion_eu=RF 转为 FE，输入：%dA %d RF，输出：%d FE
 
 # Pumps
 gregtech.machine.pump.tooltip=抽干大海的最佳手段！
