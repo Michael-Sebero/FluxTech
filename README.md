@@ -28,7 +28,7 @@ To improve the aesthetics of GregTech and improve universality with other mods w
 ### How to Build
 
 ```
-git clone https://github.com/MichaelSebero/FluxTech
+git clone https://github.com/michaelsebero/FluxTech
 
 cd /home/$USER/FluxTech/
  
