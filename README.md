@@ -10,7 +10,7 @@
 </h1>
 
 ## Requirements
-https://github.com/CleanroomMC/ModularUI/releases/download/v2.5.0-rc1/modularui-2.5.0-rc1.jar
+https://github.com/CleanroomMC/ModularUI/releases/download/v2.5.0-rc2/modularui-2.5.0-rc2.jar
 
 ### What is FluxTech?
 FluxTech is a fork of GregTech CEu bundled with [Gregfluxology](https://github.com/MCTian-mi/Gregfluxology), texture improvements from [GregTech Refreshed](https://github.com/ULSTICK/GregTechRefreshed/tree/main) and original tweaks.
