@@ -7,8 +7,6 @@ import gregtech.api.damagesources.DamageSources;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeMap;
-import gregtech.api.recipes.logic.OCParams;
-import gregtech.api.recipes.logic.OCResult;
 import gregtech.api.util.GTUtility;
 import gregtech.common.ConfigHolder;
 import gregtech.core.advancement.AdvancementTriggers;
@@ -190,14 +188,16 @@ public class RecipeLogicSteam extends AbstractRecipeLogic implements IVentable {
         tryDoVenting();
     }
 
+    @NotNull
     @Override
-    protected void performOverclocking(@NotNull Recipe recipe, @NotNull OCParams ocParams,
-                                       @NotNull OCResult ocResult) {
-        if (isHighPressure) {
-            ocResult.init(recipe.getEUt() * 2L, recipe.getDuration());
-        } else {
-            ocResult.init(recipe.getEUt(), recipe.getDuration() * 2);
-        }
+    protected int[] calculateOverclock(@NotNull Recipe recipe) {
+        // EUt, Duration
+        int[] result = new int[2];
+
+        result[0] = isHighPressure ? recipe.getEUt() * 2 : recipe.getEUt();
+        result[1] = isHighPressure ? recipe.getDuration() : recipe.getDuration() * 2;
+
+        return result;
     }
 
     @Override
@@ -216,8 +216,8 @@ public class RecipeLogicSteam extends AbstractRecipeLogic implements IVentable {
     }
 
     @Override
-    protected boolean drawEnergy(long recipeEUt, boolean simulate) {
-        int resultDraw = GTUtility.safeCastLongToInt((long) Math.ceil(recipeEUt / conversionRate));
+    protected boolean drawEnergy(int recipeEUt, boolean simulate) {
+        int resultDraw = (int) Math.ceil(recipeEUt / conversionRate);
         return resultDraw >= 0 && steamFluidTank.getFluidAmount() >= resultDraw &&
                 steamFluidTank.drain(resultDraw, !simulate) != null;
     }
@@ -228,8 +228,8 @@ public class RecipeLogicSteam extends AbstractRecipeLogic implements IVentable {
     }
 
     @Override
-    protected boolean hasEnoughPower(long eut, int duration) {
-        long totalSteam = (long) (eut * duration / conversionRate);
+    protected boolean hasEnoughPower(int @NotNull [] resultOverclock) {
+        int totalSteam = (int) (resultOverclock[0] * resultOverclock[1] / conversionRate);
         if (totalSteam > 0) {
             long steamStored = getEnergyStored();
             long steamCapacity = getEnergyCapacity();
@@ -241,7 +241,7 @@ public class RecipeLogicSteam extends AbstractRecipeLogic implements IVentable {
             return steamStored >= totalSteam;
         }
         // generation case unchanged
-        return super.hasEnoughPower(eut, duration);
+        return super.hasEnoughPower(resultOverclock);
     }
 
     @NotNull

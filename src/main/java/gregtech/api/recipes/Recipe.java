@@ -8,14 +8,15 @@ import gregtech.api.recipes.chance.output.ChancedOutputLogic;
 import gregtech.api.recipes.chance.output.impl.ChancedFluidOutput;
 import gregtech.api.recipes.chance.output.impl.ChancedItemOutput;
 import gregtech.api.recipes.ingredients.GTRecipeInput;
-import gregtech.api.recipes.properties.RecipeProperty;
-import gregtech.api.recipes.properties.RecipePropertyStorage;
-import gregtech.api.recipes.properties.RecipePropertyStorageImpl;
+import gregtech.api.recipes.recipeproperties.EmptyRecipePropertyStorage;
+import gregtech.api.recipes.recipeproperties.IRecipePropertyStorage;
+import gregtech.api.recipes.recipeproperties.RecipeProperty;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.ItemStackHashStrategy;
 import gregtech.integration.groovy.GroovyScriptModule;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -26,15 +27,15 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Class that represent machine recipe.
@@ -58,6 +59,8 @@ import java.util.List;
  */
 public class Recipe {
 
+    private static final NonNullList<ItemStack> EMPTY = NonNullList.create();
+
     /**
      * This method was deprecated in 2.8 and will be removed in 2.9
      *
@@ -70,7 +73,7 @@ public class Recipe {
     }
 
     private final List<GTRecipeInput> inputs;
-    private final List<ItemStack> outputs;
+    private final NonNullList<ItemStack> outputs;
 
     /**
      * A chance of 10000 equals 100%
@@ -85,7 +88,7 @@ public class Recipe {
     /**
      * if > 0 means EU/t consumed, if < 0 - produced
      */
-    private final long EUt;
+    private final int EUt;
 
     /**
      * If this Recipe is hidden from JEI
@@ -99,7 +102,7 @@ public class Recipe {
     // TODO YEET
     private final boolean isCTRecipe;
     private final boolean groovyRecipe;
-    private final RecipePropertyStorage recipePropertyStorage;
+    private final IRecipePropertyStorage recipePropertyStorage;
 
     private final int hashCode;
 
@@ -110,17 +113,19 @@ public class Recipe {
                   List<FluidStack> fluidOutputs,
                   @NotNull ChancedOutputList<FluidStack, ChancedFluidOutput> chancedFluidOutputs,
                   int duration,
-                  long EUt,
+                  int EUt,
                   boolean hidden,
                   boolean isCTRecipe,
-                  @NotNull RecipePropertyStorage recipePropertyStorage,
+                  IRecipePropertyStorage recipePropertyStorage,
                   @NotNull GTRecipeCategory recipeCategory) {
-        this.recipePropertyStorage = recipePropertyStorage;
+        this.recipePropertyStorage = recipePropertyStorage == null ? EmptyRecipePropertyStorage.INSTANCE :
+                recipePropertyStorage;
         this.inputs = GTRecipeInputCache.deduplicateInputs(inputs);
         if (outputs.isEmpty()) {
-            this.outputs = Collections.emptyList();
+            this.outputs = EMPTY;
         } else {
-            this.outputs = new ArrayList<>(outputs);
+            this.outputs = NonNullList.create();
+            this.outputs.addAll(outputs);
         }
         this.chancedOutputs = chancedOutputs;
         this.chancedFluidOutputs = chancedFluidOutputs;
@@ -452,7 +457,7 @@ public class Recipe {
         return inputs;
     }
 
-    public List<ItemStack> getOutputs() {
+    public NonNullList<ItemStack> getOutputs() {
         return outputs;
     }
 
@@ -470,7 +475,7 @@ public class Recipe {
      * @return A list of all resulting ItemStacks from the recipe, after chance has been applied to any chanced outputs
      */
     public List<ItemStack> getResultItemOutputs(int recipeTier, int machineTier, RecipeMap<?> recipeMap) {
-        List<ItemStack> outputs = new ArrayList<>(getOutputs());
+        List<ItemStack> outputs = new ArrayList<>(GTUtility.copyStackList(getOutputs()));
         ChanceBoostFunction function = recipeMap.getChanceFunction();
         List<ChancedItemOutput> chancedOutputsList = getChancedOutputs().roll(function, recipeTier, machineTier);
 
@@ -697,7 +702,7 @@ public class Recipe {
         return duration;
     }
 
-    public long getEUt() {
+    public int getEUt() {
         return EUt;
     }
 
@@ -741,26 +746,40 @@ public class Recipe {
     ///////////////////////////////////////////////////////////
     // Property Helper Methods //
     ///////////////////////////////////////////////////////////
-
-    /**
-     * @see RecipePropertyStorageImpl#get(RecipeProperty, Object)
-     */
-    @Contract("_, !null -> !null")
-    public <T> @Nullable T getProperty(@NotNull RecipeProperty<T> property, @Nullable T defaultValue) {
-        return recipePropertyStorage.get(property, defaultValue);
+    public <T> T getProperty(RecipeProperty<T> property, T defaultValue) {
+        return recipePropertyStorage.getRecipePropertyValue(property, defaultValue);
     }
 
-    /**
-     * @see RecipePropertyStorageImpl#contains(RecipeProperty)
-     */
-    public boolean hasProperty(@NotNull RecipeProperty<?> property) {
-        return recipePropertyStorage.contains(property);
+    public Object getPropertyRaw(String key) {
+        return recipePropertyStorage.getRawRecipePropertyValue(key);
     }
 
-    /**
-     * @return the property storage
-     */
-    public @NotNull RecipePropertyStorage propertyStorage() {
+    public Set<Map.Entry<RecipeProperty<?>, Object>> getPropertyValues() {
+        return recipePropertyStorage.getRecipeProperties();
+    }
+
+    public Set<String> getPropertyKeys() {
+        return recipePropertyStorage.getRecipePropertyKeys();
+    }
+
+    public Set<RecipeProperty<?>> getPropertyTypes() {
+        return recipePropertyStorage.getPropertyTypes();
+    }
+
+    public boolean hasProperty(RecipeProperty<?> property) {
+        return recipePropertyStorage.hasRecipeProperty(property);
+    }
+
+    public int getPropertyCount() {
+        return recipePropertyStorage.getSize();
+    }
+
+    public int getUnhiddenPropertyCount() {
+        return (int) recipePropertyStorage.getRecipeProperties().stream()
+                .filter((property) -> !property.getKey().isHidden()).count();
+    }
+
+    public IRecipePropertyStorage getRecipePropertyStorage() {
         return recipePropertyStorage;
     }
 }

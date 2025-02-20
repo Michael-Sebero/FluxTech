@@ -10,9 +10,7 @@ import gregtech.api.metatileentity.multiblock.MultiblockWithDisplayBase;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeMap;
-import gregtech.api.recipes.logic.OCParams;
-import gregtech.api.recipes.logic.OCResult;
-import gregtech.api.recipes.properties.RecipePropertyStorage;
+import gregtech.api.recipes.recipeproperties.IRecipePropertyStorage;
 import gregtech.api.util.GTUtility;
 import gregtech.common.ConfigHolder;
 
@@ -26,8 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import static gregtech.api.recipes.logic.OverclockingLogic.subTickParallelOC;
 
 public class MultiblockRecipeLogic extends AbstractRecipeLogic {
 
@@ -59,11 +55,19 @@ public class MultiblockRecipeLogic extends AbstractRecipeLogic {
     /**
      * Used to reset cached values in the Recipe Logic on structure deform
      */
-    @Override
     public void invalidate() {
-        super.invalidate();
+        previousRecipe = null;
+        progressTime = 0;
+        maxProgressTime = 0;
+        recipeEUt = 0;
+        fluidOutputs = null;
+        itemOutputs = null;
         lastRecipeIndex = 0;
+        parallelRecipesPerformed = 0;
+        isOutputsFull = false;
+        invalidInputsForRecipes = false;
         invalidatedInputList.clear();
+        setActive(false); // this marks dirty for us
     }
 
     public void onDistinctChanged() {
@@ -269,47 +273,37 @@ public class MultiblockRecipeLogic extends AbstractRecipeLogic {
                 getMaxParallelVoltage(),
                 getParallelLimit());
 
-        if (recipe != null) {
-            recipe = setupAndConsumeRecipeInputs(recipe, currentDistinctInputBus);
-            if (recipe != null) {
-                setupRecipe(recipe);
-                return true;
-            }
+        if (recipe != null && setupAndConsumeRecipeInputs(recipe, currentDistinctInputBus)) {
+            setupRecipe(recipe);
+            return true;
         }
 
         return false;
     }
 
     @Override
-    protected void modifyOverclockPre(@NotNull OCParams ocParams, @NotNull RecipePropertyStorage storage) {
-        super.modifyOverclockPre(ocParams, storage);
+    protected void modifyOverclockPre(int @NotNull [] values, @NotNull IRecipePropertyStorage storage) {
+        super.modifyOverclockPre(values, storage);
 
         // apply maintenance bonuses
         Tuple<Integer, Double> maintenanceValues = getMaintenanceValues();
 
         // duration bonus
         if (maintenanceValues.getSecond() != 1.0) {
-            ocParams.setDuration((int) Math.round(ocParams.duration() * maintenanceValues.getSecond()));
+            values[1] = (int) Math.round(values[1] * maintenanceValues.getSecond());
         }
     }
 
     @Override
-    protected void runOverclockingLogic(@NotNull OCParams ocParams, @NotNull OCResult ocResult,
-                                        @NotNull RecipePropertyStorage propertyStorage, long maxVoltage) {
-        subTickParallelOC(ocParams, ocResult, maxVoltage, getOverclockingDurationFactor(),
-                getOverclockingVoltageFactor());
-    }
-
-    @Override
-    protected void modifyOverclockPost(@NotNull OCResult ocResult, @NotNull RecipePropertyStorage storage) {
-        super.modifyOverclockPost(ocResult, storage);
+    protected void modifyOverclockPost(int[] overclockResults, @NotNull IRecipePropertyStorage storage) {
+        super.modifyOverclockPost(overclockResults, storage);
 
         // apply maintenance penalties
         Tuple<Integer, Double> maintenanceValues = getMaintenanceValues();
 
         // duration penalty
         if (maintenanceValues.getFirst() > 0) {
-            ocResult.setDuration((int) (ocResult.duration() * (1 + 0.1 * maintenanceValues.getFirst())));
+            overclockResults[1] = (int) (overclockResults[1] * (1 + 0.1 * maintenanceValues.getFirst()));
         }
     }
 
@@ -331,7 +325,7 @@ public class MultiblockRecipeLogic extends AbstractRecipeLogic {
                 // amperage is 1 when the energy is not exactly on a tier
 
                 // the voltage for recipe search is always on tier, so take the closest lower tier
-                return GTValues.VOC[GTUtility.getFloorTierByVoltage(voltage)];
+                return GTValues.V[GTUtility.getFloorTierByVoltage(voltage)];
             } else {
                 // amperage != 1 means the voltage is exactly on a tier
                 // ignore amperage, since only the voltage is relevant for recipe search
@@ -400,7 +394,7 @@ public class MultiblockRecipeLogic extends AbstractRecipeLogic {
     }
 
     @Override
-    protected boolean drawEnergy(long recipeEUt, boolean simulate) {
+    protected boolean drawEnergy(int recipeEUt, boolean simulate) {
         long resultEnergy = getEnergyStored() - recipeEUt;
         if (resultEnergy >= 0L && resultEnergy <= getEnergyCapacity()) {
             if (!simulate) getEnergyContainer().changeEnergy(-recipeEUt);
@@ -420,7 +414,7 @@ public class MultiblockRecipeLogic extends AbstractRecipeLogic {
                 // The voltage for recipe search is always on tier, so take the closest lower tier.
                 // List check is done because single hatches will always be a "clean voltage," no need
                 // for any additional checks.
-                return GTValues.VOC[GTUtility.getFloorTierByVoltage(voltage)];
+                return GTValues.V[GTUtility.getFloorTierByVoltage(voltage)];
             }
             return voltage;
         } else {

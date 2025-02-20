@@ -5,8 +5,6 @@ import gregtech.api.GregTechAPI;
 import gregtech.api.fluids.FluidBuilder;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.metatileentity.MetaTileEntity;
-import gregtech.api.metatileentity.registry.MTEManager;
-import gregtech.api.metatileentity.registry.MTERegistry;
 import gregtech.api.modules.GregTechModule;
 import gregtech.api.recipes.RecipeBuilder;
 import gregtech.api.recipes.RecipeMap;
@@ -18,7 +16,6 @@ import gregtech.api.unification.material.event.MaterialEvent;
 import gregtech.api.unification.material.event.PostMaterialEvent;
 import gregtech.api.unification.material.registry.MaterialRegistry;
 import gregtech.api.unification.ore.OrePrefix;
-import gregtech.api.util.GTUtility;
 import gregtech.api.util.Mods;
 import gregtech.common.blocks.BlockCompressed;
 import gregtech.common.blocks.BlockFrame;
@@ -61,7 +58,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.IntStream;
 
 @Optional.Interface(modid = Mods.Names.GROOVY_SCRIPT,
                     iface = "com.cleanroommc.groovyscript.api.GroovyPlugin",
@@ -76,8 +72,6 @@ public class GroovyScriptModule extends IntegrationSubmodule implements GroovyPl
 
     private static GroovyContainer<?> modSupportContainer;
     private static final Object2ObjectOpenHashMap<String, Map<String, ItemStack>> metaItems = new Object2ObjectOpenHashMap<>();
-
-    private static final ResourceLocation MODULE_ID = GTUtility.gregtechId(GregTechModules.MODULE_GRS);
 
     @NotNull
     @Override
@@ -96,13 +90,6 @@ public class GroovyScriptModule extends IntegrationSubmodule implements GroovyPl
         // Not Needed if JEI Module is enabled
         if (!GregTechAPI.moduleManager.isModuleEnabled(GregTechModules.MODULE_JEI))
             GTRecipeOreInput.refreshStackCache();
-    }
-
-    @SubscribeEvent
-    public static void onMTERegistries(MTEManager.MTERegistryEvent event) {
-        // automatically create a registry for groovyscript to store its MTEs
-        GregTechAPI.mteManager.createRegistry(getPackId());
-        GregTechAPI.MIGRATIONS.registriesMigrator().migrate(getPackId(), IntStream.rangeClosed(32000, Short.MAX_VALUE));
     }
 
     public static boolean isCurrentlyRunning() {
@@ -165,8 +152,7 @@ public class GroovyScriptModule extends IntegrationSubmodule implements GroovyPl
 
     @Nullable
     public static ItemStack getMetaTileEntityItem(String[] split) {
-        MTERegistry registry = GregTechAPI.mteManager.getRegistry(split[0]);
-        MetaTileEntity metaTileEntity = registry.getObject(new ResourceLocation(split[0], split[1]));
+        MetaTileEntity metaTileEntity = GregTechAPI.MTE_REGISTRY.getObject(new ResourceLocation(split[0], split[1]));
         return metaTileEntity == null ? null : metaTileEntity.getStackForm();
     }
 
@@ -314,7 +300,6 @@ public class GroovyScriptModule extends IntegrationSubmodule implements GroovyPl
         ExpansionHelper.mixinMethod(MaterialEvent.class, GroovyExpansions.class, "materialBuilder");
         ExpansionHelper.mixinMethod(MaterialEvent.class, GroovyExpansions.class, "toolBuilder");
         ExpansionHelper.mixinMethod(MaterialEvent.class, GroovyExpansions.class, "fluidBuilder");
-        ExpansionHelper.mixinMethod(MaterialEvent.class, GroovyExpansions.class, "addElement");
         ExpansionHelper.mixinMethod(PostMaterialEvent.class, GroovyExpansions.class, "toolBuilder");
         ExpansionHelper.mixinMethod(PostMaterialEvent.class, GroovyExpansions.class, "fluidBuilder");
         ExpansionHelper.mixinMethod(FluidBuilder.class, GroovyExpansions.class, "acidic");
@@ -332,15 +317,5 @@ public class GroovyScriptModule extends IntegrationSubmodule implements GroovyPl
         GroovyLog.get().error(
                 "Cannot {0} of a Material with no {1}! Try calling \"add{1}\" in your late material event first if this is intentional. Material: {2}",
                 cause, type, m.getUnlocalizedName());
-    }
-
-    /**
-     * @return the modid used in scripts
-     */
-    public static @NotNull String getPackId() {
-        if (GregTechAPI.moduleManager.isModuleEnabled(MODULE_ID)) {
-            return GroovyScript.getRunConfig().getPackOrModId();
-        }
-        return "";
     }
 }

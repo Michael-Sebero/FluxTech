@@ -16,11 +16,8 @@ import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeBuilder;
 import gregtech.api.recipes.RecipeMap;
 import gregtech.api.recipes.logic.IParallelableRecipeLogic;
-import gregtech.api.recipes.logic.OCParams;
-import gregtech.api.recipes.logic.OCResult;
-import gregtech.api.recipes.properties.RecipePropertyStorage;
-import gregtech.api.recipes.properties.impl.CleanroomProperty;
-import gregtech.api.recipes.properties.impl.DimensionProperty;
+import gregtech.api.recipes.recipeproperties.CleanroomProperty;
+import gregtech.api.recipes.recipeproperties.IRecipePropertyStorage;
 import gregtech.api.util.GTLog;
 import gregtech.api.util.GTTransferUtils;
 import gregtech.api.util.GTUtility;
@@ -30,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
@@ -37,7 +35,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,17 +57,16 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
     protected Recipe previousRecipe;
     private boolean allowOverclocking = true;
     protected int parallelRecipesPerformed;
-    private long overclockVoltage;
-    private final OCParams ocParams = new OCParams();
-    private final OCResult ocResult = new OCResult();
+    private long overclockVoltage = 0;
+    protected int[] overclockResults;
 
     protected boolean canRecipeProgress = true;
 
     protected int progressTime;
     protected int maxProgressTime;
-    protected long recipeEUt;
+    protected int recipeEUt;
     protected List<FluidStack> fluidOutputs;
-    protected List<ItemStack> itemOutputs;
+    protected NonNullList<ItemStack> itemOutputs;
 
     protected boolean isActive;
     protected boolean workingEnabled = true;
@@ -79,7 +75,7 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
     protected boolean isOutputsFull;
     protected boolean invalidInputsForRecipes;
 
-    protected boolean hasPerfectOC;
+    protected boolean hasPerfectOC = false;
 
     /**
      * DO NOT use the parallelLimit field directly, EVER
@@ -120,7 +116,7 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
      * @param simulate  whether to simulate energy extraction or not
      * @return true if the energy can/was drained, otherwise false
      */
-    protected abstract boolean drawEnergy(long recipeEUt, boolean simulate);
+    protected abstract boolean drawEnergy(int recipeEUt, boolean simulate);
 
     /**
      * @return the maximum voltage the machine can use/handle for recipe searching
@@ -247,16 +243,16 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
      * @return true if input inventory contents have changed
      */
     protected boolean hasNotifiedInputs() {
-        return !metaTileEntity.getNotifiedItemInputList().isEmpty() ||
-                !metaTileEntity.getNotifiedFluidInputList().isEmpty();
+        return (metaTileEntity.getNotifiedItemInputList().size() > 0 ||
+                metaTileEntity.getNotifiedFluidInputList().size() > 0);
     }
 
     /**
      * @return true if output inventory contents have changed
      */
     protected boolean hasNotifiedOutputs() {
-        return !metaTileEntity.getNotifiedItemOutputList().isEmpty() ||
-                !metaTileEntity.getNotifiedFluidOutputList().isEmpty();
+        return (metaTileEntity.getNotifiedItemOutputList().size() > 0 ||
+                metaTileEntity.getNotifiedFluidOutputList().size() > 0);
     }
 
     /**
@@ -416,7 +412,7 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
      * @return true if the recipe is allowed to be used, else false
      */
     public boolean checkRecipe(@NotNull Recipe recipe) {
-        return checkCleanroomRequirement(recipe) && checkDimensionRequirement(recipe);
+        return checkCleanroomRequirement(recipe);
     }
 
     /**
@@ -438,14 +434,6 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
         }
 
         return false;
-    }
-
-    protected boolean checkDimensionRequirement(@NotNull Recipe recipe) {
-        DimensionProperty.DimensionPropertyList list = recipe.getProperty(DimensionProperty.getInstance(), null);
-        if (list == null) {
-            return true;
-        }
-        return list.checkDimension(this.getMetaTileEntity().getWorld().provider.getDimension());
     }
 
     /**
@@ -494,12 +482,9 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
                 getMaxParallelVoltage(),
                 getParallelLimit());
 
-        if (recipe != null) {
-            recipe = setupAndConsumeRecipeInputs(recipe, inputInventory, inputFluidInventory);
-            if (recipe != null) {
-                setupRecipe(recipe);
-                return true;
-            }
+        if (recipe != null && setupAndConsumeRecipeInputs(recipe, inputInventory, inputFluidInventory)) {
+            setupRecipe(recipe);
+            return true;
         }
         return false;
     }
@@ -650,72 +635,33 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
 
     /**
      * Determines if the provided recipe is possible to run from the provided inventory, or if there is anything
-     * preventing the Recipe from being completed.
+     * preventing
+     * the Recipe from being completed.
      * <p>
      * Will consume the inputs of the Recipe if it is possible to run.
      *
-     * @param recipe          The Recipe that will be consumed from the inputs and ran in the machine
-     * @param importInventory The inventory that the recipe should be consumed from. Used mainly for Distinct bus
-     *                        implementation for multiblocks to specify a specific bus
-     * @return the recipe if the setup is successful, null if the setup is not successful
+     * @param recipe          - The Recipe that will be consumed from the inputs and ran in the machine
+     * @param importInventory - The inventory that the recipe should be consumed from.
+     *                        Used mainly for Distinct bus implementation for multiblocks to specify
+     *                        a specific bus, or for addons to use external inventories.
+     * @param importFluids    - The tanks that the recipe should be consumed from
+     *                        Used currently in addons to use external tanks.
+     * @return - true if the recipe is successful, false if the recipe is not successful
      */
-    @MustBeInvokedByOverriders
-    protected @Nullable Recipe setupAndConsumeRecipeInputs(@NotNull Recipe recipe,
-                                                           @NotNull IItemHandlerModifiable importInventory) {
-        return setupAndConsumeRecipeInputs(recipe, importInventory, this.getInputTank());
-    }
+    protected boolean setupAndConsumeRecipeInputs(@NotNull Recipe recipe,
+                                                  @NotNull IItemHandlerModifiable importInventory,
+                                                  @NotNull IMultipleTankHandler importFluids) {
+        this.overclockResults = calculateOverclock(recipe);
 
-    /**
-     * Determines if the provided recipe is possible to run from the provided inventory, or if there is anything
-     * preventing the Recipe from being completed.
-     * <p>
-     * Will consume the inputs of the Recipe if it is possible to run.
-     *
-     * @param recipe          The Recipe that will be consumed from the inputs and ran in the machine
-     * @param importInventory The inventory that the recipe should be consumed from. Used mainly for Distinct bus
-     *                        implementation for multiblocks to specify a specific bus, or for addons to use external
-     *                        inventories.
-     * @param importFluids    The tanks that the recipe should be consumed from Used currently in addons to use
-     *                        external tanks.
-     * @return the recipe if the setup is successful, null if the setup is not successful
-     */
-    protected final @Nullable Recipe setupAndConsumeRecipeInputs(@NotNull Recipe recipe,
-                                                                 @NotNull IItemHandlerModifiable importInventory,
-                                                                 @NotNull IMultipleTankHandler importFluids) {
-        calculateOverclock(recipe);
+        modifyOverclockPost(overclockResults, recipe.getRecipePropertyStorage());
 
-        modifyOverclockPost(ocResult, recipe.propertyStorage());
-
-        if (ocResult.parallel() > 1) {
-            recipe = subTickOC(ocResult, recipe, importInventory, importFluids);
-            if (recipe == null) {
-                invalidateInputs();
-                return null;
-            }
+        if (!hasEnoughPower(overclockResults)) {
+            return false;
         }
 
-        if (!hasEnoughPower(ocResult.eut(), ocResult.duration())) {
-            ocResult.reset();
-            return null;
-        }
+        IItemHandlerModifiable exportInventory = getOutputInventory();
+        IMultipleTankHandler exportFluids = getOutputTank();
 
-        if (checkOutputSpaceItems(recipe, getOutputInventory()) && checkOutputSpaceFluids(recipe, getOutputTank())) {
-            this.isOutputsFull = false;
-            if (recipe.matches(true, importInventory, importFluids)) {
-                this.metaTileEntity.addNotifiedInput(importInventory);
-                return recipe;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param recipe          the recipe to check
-     * @param exportInventory the inventory to output to
-     * @return if the recipe can be successfully output to the inventory
-     */
-    protected boolean checkOutputSpaceItems(@NotNull Recipe recipe, @NotNull IItemHandlerModifiable exportInventory) {
         // We have already trimmed outputs and chanced outputs at this time
         // Attempt to merge all outputs + chanced outputs into the output bus, to prevent voiding chanced outputs
         if (!metaTileEntity.canVoidRecipeItemOutputs() &&
@@ -723,140 +669,110 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
             this.isOutputsFull = true;
             return false;
         }
-        return true;
-    }
 
-    /**
-     * @param recipe       the recipe to check
-     * @param exportFluids the inventory to output to
-     * @return if the recipe can be successfully output to the inventory
-     */
-    protected boolean checkOutputSpaceFluids(@NotNull Recipe recipe, @NotNull IMultipleTankHandler exportFluids) {
         // We have already trimmed fluid outputs at this time
         if (!metaTileEntity.canVoidRecipeFluidOutputs() &&
                 !GTTransferUtils.addFluidsToFluidHandler(exportFluids, true, recipe.getAllFluidOutputs())) {
             this.isOutputsFull = true;
             return false;
         }
-        return true;
+
+        this.isOutputsFull = false;
+        if (recipe.matches(true, importInventory, importFluids)) {
+            this.metaTileEntity.addNotifiedInput(importInventory);
+            return true;
+        }
+        return false;
     }
 
     /**
-     * Overclock a recipe beyond a duration of 1 tick using parallelization.
+     * Determines if the provided recipe is possible to run from the provided inventory, or if there is anything
+     * preventing
+     * the Recipe from being completed.
+     * <p>
+     * Will consume the inputs of the Recipe if it is possible to run.
      *
-     * @param ocResult        the result of the overclock
-     * @param recipe          the recipe to overclock
-     * @param importInventory the input item inventory
-     * @param importFluids    the input fluid inventory
-     * @return the recipe if a valid recipe is produced, otherwise null
+     * @param recipe          - The Recipe that will be consumed from the inputs and ran in the machine
+     * @param importInventory - The inventory that the recipe should be consumed from.
+     *                        Used mainly for Distinct bus implementation for multiblocks to specify
+     *                        a specific bus
+     * @return - true if the recipe is successful, false if the recipe is not successful
      */
-    protected @Nullable Recipe subTickOC(@NotNull OCResult ocResult, @NotNull Recipe recipe,
-                                         @NotNull IItemHandlerModifiable importInventory,
-                                         @NotNull IMultipleTankHandler importFluids) {
-        RecipeMap<?> map = getRecipeMap();
-        if (map == null) {
-            return null;
-        }
-
-        Recipe r = new RecipeBuilder<>(recipe, map)
-                .EUt(ocResult.eut())
-                .build()
-                .getResult();
-
-        if (r == null) {
-            // should be impossible, but check anyway
-            return recipe;
-        }
-
-        RecipeBuilder<?> builder = findMultipliedParallelRecipe(map, r, importInventory, importFluids,
-                getOutputInventory(), getOutputTank(), ocResult.parallel(), ocResult.parallelEUt(),
-                getMetaTileEntity());
-
-        if (builder == null) {
-            return null;
-        }
-
-        if (builder.getParallel() == 0) {
-            return recipe;
-        }
-
-        ocResult.setEut(builder.getEUt());
-        r = builder.EUt(builder.getEUt())
-                .build()
-                .getResult();
-
-        if (r == null) {
-            return recipe;
-        }
-
-        return r;
+    protected boolean setupAndConsumeRecipeInputs(@NotNull Recipe recipe,
+                                                  @NotNull IItemHandlerModifiable importInventory) {
+        return setupAndConsumeRecipeInputs(recipe, importInventory, this.getInputTank());
     }
 
     /**
-     * @param eut      the overclocked EUt to check
-     * @param duration the overclocked duration to check
+     * @param resultOverclock the overclock data to use. Format: {@code [EUt, duration]}.
      * @return true if there is enough energy to continue recipe progress
      */
-    protected boolean hasEnoughPower(long eut, int duration) {
-        if (eut >= 0) {
-            // Power Consumption case
+    protected boolean hasEnoughPower(int @NotNull [] resultOverclock) {
+        // Format of resultOverclock: EU/t, duration
+        int recipeEUt = resultOverclock[0];
+
+        // RIP Ternary
+        // Power Consumption case
+        if (recipeEUt >= 0) {
             // ensure it can run for at least 8 ticks. Arbitrary value, but should prevent instant failures
-            return getEnergyStored() >= (eut << 3);
-        } else {
-            // Power Generation case
+            return getEnergyStored() >= ((long) recipeEUt << 3);
+        }
+        // Power Generation case
+        else {
             // Return true if we can fit at least 1A of energy into the energy output
-            return getEnergyStored() - eut <= getEnergyCapacity();
+            return getEnergyStored() - (long) recipeEUt <= getEnergyCapacity();
         }
     }
 
     /**
-     * Method for modifying the overclock results, such as for Multiblock coil bonuses. Is always called, even if no
-     * overclocks are performed.
+     * Method for modifying the overclock results, such as for Multiblock coil bonuses.
+     * Is always called, even if no overclocks are performed.
      *
-     * @param ocResult The overclock result
-     * @param storage  the RecipePropertyStorage of the recipe being processed
+     * @param overclockResults The overclocked recipe EUt and duration, in format [EUt, duration]
+     * @param storage          the RecipePropertyStorage of the recipe being processed
      */
-    protected void modifyOverclockPost(@NotNull OCResult ocResult, @NotNull RecipePropertyStorage storage) {}
+    protected void modifyOverclockPost(int[] overclockResults, @NotNull IRecipePropertyStorage storage) {}
 
     /**
      * Calculates the overclocked Recipe's final duration and EU/t
      *
      * @param recipe the recipe to run
+     * @return an int array of {OverclockedEUt, OverclockedDuration}
      */
-    protected final void calculateOverclock(@NotNull Recipe recipe) {
+    @NotNull
+    protected int[] calculateOverclock(@NotNull Recipe recipe) {
         // perform the actual overclocking
-        ocParams.initialize(recipe.getEUt(), recipe.getDuration(), getNumberOfOCs(recipe.getEUt()));
-        performOverclocking(recipe, this.ocParams, this.ocResult);
-        ocParams.reset();
+        return performOverclocking(recipe);
     }
 
     /**
-     * Determines the maximum number of overclocks that can be performed for a recipe. Then performs overclocking on the
-     * Recipe.
+     * Determines the maximum number of overclocks that can be performed for a recipe.
+     * Then performs overclocking on the Recipe.
      *
-     * @param recipe   the recipe to overclock
-     * @param ocParams the parameters for overclocking
-     * @param ocResult the result of overclocking
+     * @param recipe the recipe to overclock
+     * @return an int array of {OverclockedEUt, OverclockedDuration}
      */
-    protected void performOverclocking(@NotNull Recipe recipe, @NotNull OCParams ocParams, @NotNull OCResult ocResult) {
-        modifyOverclockPre(ocParams, recipe.propertyStorage());
+    protected int @NotNull [] performOverclocking(@NotNull Recipe recipe) {
+        int[] values = { recipe.getEUt(), recipe.getDuration(), getNumberOfOCs(recipe.getEUt()) };
+        modifyOverclockPre(values, recipe.getRecipePropertyStorage());
 
-        if (ocParams.ocAmount() <= 0) {
+        if (values[2] <= 0) {
             // number of OCs is <= 0, so do not overclock
-            ocResult.init(ocParams.eut(), ocParams.duration());
-        } else {
-            runOverclockingLogic(ocParams, ocResult, recipe.propertyStorage(), getMaximumOverclockVoltage());
+            return new int[] { values[0], values[1] };
         }
+
+        return runOverclockingLogic(recipe.getRecipePropertyStorage(), values[0], getMaximumOverclockVoltage(),
+                values[1], values[2]);
     }
 
     /**
      * @param recipeEUt the EUt of the recipe
      * @return the number of times to overclock the recipe
      */
-    protected int getNumberOfOCs(long recipeEUt) {
+    protected int getNumberOfOCs(int recipeEUt) {
         if (!isAllowOverclocking()) return 0;
 
-        int recipeTier = GTUtility.getOCTierByVoltage(recipeEUt);
+        int recipeTier = GTUtility.getTierByVoltage(recipeEUt);
         int maximumTier = getOverclockForTier(getMaximumOverclockVoltage());
         if (maximumTier <= GTValues.LV) return 0;
 
@@ -869,40 +785,50 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
     }
 
     /**
-     * Perform changes to the recipe EUt, duration, and OC count before overclocking. Is always called, even if no
-     * overclocks are to be performed.
+     * Perform changes to the recipe EUt, duration, and OC count before overclocking.
+     * Is always called, even if no overclocks are to be performed.
      *
-     * @param ocParams an array of [recipeEUt, recipeDuration, numberOfOCs]
-     * @param storage  the RecipePropertyStorage of the recipe being processed
+     * @param values  an array of [recipeEUt, recipeDuration, numberOfOCs]
+     * @param storage the RecipePropertyStorage of the recipe being processed
      */
-    protected void modifyOverclockPre(@NotNull OCParams ocParams, @NotNull RecipePropertyStorage storage) {}
+    protected void modifyOverclockPre(@NotNull int[] values, @NotNull IRecipePropertyStorage storage) {}
 
     /**
-     * Calls the desired overclocking logic to be run for the recipe. Performs the actual overclocking on the provided
-     * recipe. Override this to call custom overclocking mechanics
+     * Calls the desired overclocking logic to be run for the recipe.
+     * Performs the actual overclocking on the provided recipe.
+     * Override this to call custom overclocking mechanics
      *
-     * @param ocParams        the parameters for the overclock
-     * @param ocResult        the result to store the overclock in
      * @param propertyStorage the recipe's property storage
+     * @param recipeEUt       the EUt of the recipe
      * @param maxVoltage      the maximum voltage the recipe is allowed to be run at
+     * @param duration        the duration of the recipe
+     * @param amountOC        the maximum amount of overclocks to perform
+     * @return an int array of {OverclockedEUt, OverclockedDuration}
      */
-    protected void runOverclockingLogic(@NotNull OCParams ocParams, @NotNull OCResult ocResult,
-                                        @NotNull RecipePropertyStorage propertyStorage, long maxVoltage) {
-        standardOC(ocParams, ocResult, maxVoltage, getOverclockingDurationFactor(), getOverclockingVoltageFactor());
+    @NotNull
+    protected int[] runOverclockingLogic(@NotNull IRecipePropertyStorage propertyStorage, int recipeEUt,
+                                         long maxVoltage, int duration, int amountOC) {
+        return standardOverclockingLogic(
+                Math.abs(recipeEUt),
+                maxVoltage,
+                duration,
+                amountOC,
+                getOverclockingDurationDivisor(),
+                getOverclockingVoltageMultiplier());
     }
 
     /**
-     * @return the multiplier to use for reducing duration upon overclocking
+     * @return the divisor to use for reducing duration upon overclocking
      */
-    protected double getOverclockingDurationFactor() {
-        return hasPerfectOC ? PERFECT_DURATION_FACTOR : STD_DURATION_FACTOR;
+    protected double getOverclockingDurationDivisor() {
+        return hasPerfectOC ? PERFECT_OVERCLOCK_DURATION_DIVISOR : STANDARD_OVERCLOCK_DURATION_DIVISOR;
     }
 
     /**
      * @return the multiplier to use for increasing voltage upon overclocking
      */
-    protected double getOverclockingVoltageFactor() {
-        return STD_VOLTAGE_FACTOR;
+    protected double getOverclockingVoltageMultiplier() {
+        return STANDARD_OVERCLOCK_VOLTAGE_MULTIPLIER;
     }
 
     /**
@@ -913,7 +839,7 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
      * @return the highest voltage tier the machine should use to overclock with
      */
     protected int getOverclockForTier(long voltage) {
-        return GTUtility.getOCTierByVoltage(voltage);
+        return GTUtility.getTierByVoltage(voltage);
     }
 
     /**
@@ -937,22 +863,16 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
      *
      * @param recipe the recipe to run
      */
-    @MustBeInvokedByOverriders
-    protected void setupRecipe(@NotNull Recipe recipe) {
+    protected void setupRecipe(Recipe recipe) {
         this.progressTime = 1;
-        setMaxProgress(ocResult.duration());
-        this.recipeEUt = consumesEnergy() ? ocResult.eut() : -ocResult.eut();
-
+        setMaxProgress(overclockResults[1]);
+        this.recipeEUt = overclockResults[0];
         int recipeTier = GTUtility.getTierByVoltage(recipe.getEUt());
         int machineTier = getOverclockForTier(getMaximumOverclockVoltage());
-
-        RecipeMap<?> map = getRecipeMap();
-        if (map != null) {
-            this.fluidOutputs = GTUtility
-                    .copyFluidList(recipe.getResultFluidOutputs(recipeTier, machineTier, map));
-            this.itemOutputs = GTUtility
-                    .copyStackList(recipe.getResultItemOutputs(recipeTier, machineTier, map));
-        }
+        this.fluidOutputs = GTUtility
+                .copyFluidList(recipe.getResultFluidOutputs(recipeTier, machineTier, getRecipeMap()));
+        this.itemOutputs = GTUtility
+                .copyStackList(recipe.getResultItemOutputs(recipeTier, machineTier, getRecipeMap()));
 
         if (this.wasActiveAndNeedsUpdate) {
             this.wasActiveAndNeedsUpdate = false;
@@ -974,7 +894,7 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
         this.hasNotEnoughEnergy = false;
         this.wasActiveAndNeedsUpdate = true;
         this.parallelRecipesPerformed = 0;
-        this.ocResult.reset();
+        this.overclockResults = new int[] { 0, 0 };
     }
 
     /**
@@ -1005,14 +925,14 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
     /**
      * @return the current recipe's EU/t
      */
-    public long getRecipeEUt() {
+    public int getRecipeEUt() {
         return recipeEUt;
     }
 
     /**
      * @return the current recipe's EU/t for TOP/Waila/Tricorder
      */
-    public long getInfoProviderEUt() {
+    public int getInfoProviderEUt() {
         return getRecipeEUt();
     }
 
@@ -1148,24 +1068,6 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
         setMaximumOverclockVoltage(GTValues.V[tier]);
     }
 
-    /**
-     * Used to reset cached values in the Recipe Logic on events such as multiblock structure deformation
-     */
-    @MustBeInvokedByOverriders
-    public void invalidate() {
-        previousRecipe = null;
-        progressTime = 0;
-        maxProgressTime = 0;
-        recipeEUt = 0;
-        fluidOutputs = null;
-        itemOutputs = null;
-        parallelRecipesPerformed = 0;
-        isOutputsFull = false;
-        invalidInputsForRecipes = false;
-        this.ocResult.reset();
-        setActive(false); // this marks dirty for us
-    }
-
     @Override
     public void receiveCustomData(int dataId, @NotNull PacketBuffer buf) {
         if (dataId == GregtechDataCodes.WORKABLE_ACTIVE) {
@@ -1200,7 +1102,7 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
         if (progressTime > 0) {
             compound.setInteger("Progress", progressTime);
             compound.setInteger("MaxProgress", maxProgressTime);
-            compound.setLong("RecipeEUt", this.recipeEUt);
+            compound.setInteger("RecipeEUt", this.recipeEUt);
             NBTTagList itemOutputsList = new NBTTagList();
             for (ItemStack itemOutput : itemOutputs) {
                 itemOutputsList.appendTag(itemOutput.writeToNBT(new NBTTagCompound()));
@@ -1226,9 +1128,9 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
         if (progressTime > 0) {
             this.isActive = true;
             this.maxProgressTime = compound.getInteger("MaxProgress");
-            this.recipeEUt = compound.getLong("RecipeEUt");
+            this.recipeEUt = compound.getInteger("RecipeEUt");
             NBTTagList itemOutputsList = compound.getTagList("ItemOutputs", Constants.NBT.TAG_COMPOUND);
-            this.itemOutputs = new ArrayList<>(itemOutputsList.tagCount());
+            this.itemOutputs = NonNullList.create();
             for (int i = 0; i < itemOutputsList.tagCount(); i++) {
                 this.itemOutputs.add(new ItemStack(itemOutputsList.getCompoundTagAt(i)));
             }

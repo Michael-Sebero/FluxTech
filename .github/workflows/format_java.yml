@@ -5,7 +5,9 @@ on:
   push:
     branches:
       - master
+    paths: ['src/main/java/**', 'src/test/**']
   pull_request:
+    paths: ['src/main/java/**', 'src/test/**']
 
 concurrency:
   group: formatting-${{ github.head_ref || github.ref }}

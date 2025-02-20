@@ -45,7 +45,8 @@ public class RecipeLogicInfoProvider extends CapabilityInfoProvider<AbstractReci
             if (capability instanceof PrimitiveRecipeLogic) {
                 return; // do not show info for primitive machines, as they are supposed to appear powerless
             }
-            long eut = capability.getInfoProviderEUt();
+            int EUt = capability.getInfoProviderEUt();
+            int absEUt = Math.abs(EUt);
             String text = null;
 
             if (tileEntity instanceof IGregTechTileEntity) {
@@ -53,7 +54,7 @@ public class RecipeLogicInfoProvider extends CapabilityInfoProvider<AbstractReci
                 MetaTileEntity mte = gtTileEntity.getMetaTileEntity();
                 if (mte instanceof SteamMetaTileEntity || mte instanceof MetaTileEntityLargeBoiler ||
                         mte instanceof RecipeMapSteamMultiblockController) {
-                    text = TextFormatting.AQUA + TextFormattingUtil.formatNumbers(eut) +
+                    text = TextFormatting.AQUA.toString() + TextFormattingUtil.formatNumbers(absEUt) +
                             TextStyleClass.INFO + " L/t {*" +
                             Materials.Steam.getUnlocalizedName() + "*}";
                 }
@@ -61,12 +62,12 @@ public class RecipeLogicInfoProvider extends CapabilityInfoProvider<AbstractReci
             if (text == null) {
                 // Default behavior, if this TE is not a steam machine (or somehow not instanceof
                 // IGregTechTileEntity...)
-                text = TextFormatting.RED + TextFormattingUtil.formatNumbers(eut) + TextStyleClass.INFO +
+                text = TextFormatting.RED.toString() + TextFormattingUtil.formatNumbers(absEUt) + TextStyleClass.INFO +
                         " EU/t" + TextFormatting.GREEN +
-                        " (" + GTValues.VOCNF[GTUtility.getOCTierByVoltage(eut)] + TextFormatting.GREEN + ")";
+                        " (" + GTValues.VNF[GTUtility.getTierByVoltage(absEUt)] + TextFormatting.GREEN + ")";
             }
 
-            if (eut == 0) return; // do not display 0 eut
+            if (EUt == 0) return; // idk what to do for 0 eut
 
             if (capability.consumesEnergy()) {
                 probeInfo.text(TextStyleClass.INFO + "{*gregtech.top.energy_consumption*} " + text);

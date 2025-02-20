@@ -21,89 +21,20 @@ import gregtech.common.ConfigHolder;
 import gregtech.common.blocks.BlockTurbineCasing;
 import gregtech.common.blocks.MetaBlocks;
 import gregtech.common.metatileentities.converter.MetaTileEntityConverter;
-import gregtech.common.metatileentities.electric.MetaTileEntityAlarm;
-import gregtech.common.metatileentities.electric.MetaTileEntityBatteryBuffer;
-import gregtech.common.metatileentities.electric.MetaTileEntityBlockBreaker;
-import gregtech.common.metatileentities.electric.MetaTileEntityCharger;
-import gregtech.common.metatileentities.electric.MetaTileEntityDiode;
-import gregtech.common.metatileentities.electric.MetaTileEntityFisher;
-import gregtech.common.metatileentities.electric.MetaTileEntityGasCollector;
-import gregtech.common.metatileentities.electric.MetaTileEntityHull;
-import gregtech.common.metatileentities.electric.MetaTileEntityItemCollector;
-import gregtech.common.metatileentities.electric.MetaTileEntityMagicEnergyAbsorber;
-import gregtech.common.metatileentities.electric.MetaTileEntityMiner;
-import gregtech.common.metatileentities.electric.MetaTileEntityPump;
-import gregtech.common.metatileentities.electric.MetaTileEntityRockBreaker;
-import gregtech.common.metatileentities.electric.MetaTileEntitySingleCombustion;
-import gregtech.common.metatileentities.electric.MetaTileEntitySingleTurbine;
-import gregtech.common.metatileentities.electric.MetaTileEntityTransformer;
-import gregtech.common.metatileentities.electric.MetaTileEntityWorldAccelerator;
-import gregtech.common.metatileentities.electric.SimpleMachineMetaTileEntityResizable;
-import gregtech.common.metatileentities.multi.BoilerType;
-import gregtech.common.metatileentities.multi.MetaTileEntityCokeOven;
-import gregtech.common.metatileentities.multi.MetaTileEntityCokeOvenHatch;
-import gregtech.common.metatileentities.multi.MetaTileEntityLargeBoiler;
-import gregtech.common.metatileentities.multi.MetaTileEntityMultiblockTank;
-import gregtech.common.metatileentities.multi.MetaTileEntityPrimitiveBlastFurnace;
-import gregtech.common.metatileentities.multi.MetaTileEntityPrimitiveWaterPump;
-import gregtech.common.metatileentities.multi.MetaTileEntityPumpHatch;
-import gregtech.common.metatileentities.multi.MetaTileEntityTankValve;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityActiveTransformer;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityAssemblyLine;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityCleanroom;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityCrackingUnit;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityDataBank;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityDistillationTower;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityElectricBlastFurnace;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityFluidDrill;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityFusionReactor;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityHPCA;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityImplosionCompressor;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityLargeChemicalReactor;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityLargeMiner;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityMultiSmelter;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityNetworkSwitch;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityPowerSubstation;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityProcessingArray;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityPyrolyseOven;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityResearchStation;
-import gregtech.common.metatileentities.multi.electric.MetaTileEntityVacuumFreezer;
+import gregtech.common.metatileentities.electric.*;
+import gregtech.common.metatileentities.multi.*;
+import gregtech.common.metatileentities.multi.electric.*;
 import gregtech.common.metatileentities.multi.electric.centralmonitor.MetaTileEntityCentralMonitor;
 import gregtech.common.metatileentities.multi.electric.centralmonitor.MetaTileEntityMonitorScreen;
 import gregtech.common.metatileentities.multi.electric.generator.MetaTileEntityLargeCombustionEngine;
 import gregtech.common.metatileentities.multi.electric.generator.MetaTileEntityLargeTurbine;
-import gregtech.common.metatileentities.multi.fission.MTEFissionReactor;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityAutoMaintenanceHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityCleaningMaintenanceHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityComputationHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityDataAccessHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityEnergyHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityFluidHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityItemBus;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityLaserHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMachineHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMaintenanceHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMufflerHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiFluidHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityObjectHolder;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityOpticalDataHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityPassthroughHatchFluid;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityPassthroughHatchItem;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityReservoirHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityRotorHolder;
-import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntitySubstationEnergyHatch;
+import gregtech.common.metatileentities.multi.multiblockpart.*;
 import gregtech.common.metatileentities.multi.multiblockpart.appeng.MetaTileEntityMEInputBus;
 import gregtech.common.metatileentities.multi.multiblockpart.appeng.MetaTileEntityMEInputHatch;
 import gregtech.common.metatileentities.multi.multiblockpart.appeng.MetaTileEntityMEOutputBus;
 import gregtech.common.metatileentities.multi.multiblockpart.appeng.MetaTileEntityMEOutputHatch;
 import gregtech.common.metatileentities.multi.multiblockpart.appeng.MetaTileEntityMEStockingBus;
 import gregtech.common.metatileentities.multi.multiblockpart.appeng.MetaTileEntityMEStockingHatch;
-import gregtech.common.metatileentities.multi.multiblockpart.fission.MTEControlRod;
-import gregtech.common.metatileentities.multi.multiblockpart.fission.MTECoolantChannel;
-import gregtech.common.metatileentities.multi.multiblockpart.fission.MTEEmptyFissionComponent;
-import gregtech.common.metatileentities.multi.multiblockpart.fission.MTEFissionFuel;
-import gregtech.common.metatileentities.multi.multiblockpart.fission.MTEModerator;
-import gregtech.common.metatileentities.multi.multiblockpart.fission.MTENeutronReflector;
 import gregtech.common.metatileentities.multi.multiblockpart.hpca.MetaTileEntityHPCABridge;
 import gregtech.common.metatileentities.multi.multiblockpart.hpca.MetaTileEntityHPCAComputation;
 import gregtech.common.metatileentities.multi.multiblockpart.hpca.MetaTileEntityHPCACooler;
@@ -111,38 +42,18 @@ import gregtech.common.metatileentities.multi.multiblockpart.hpca.MetaTileEntity
 import gregtech.common.metatileentities.multi.steam.MetaTileEntitySteamGrinder;
 import gregtech.common.metatileentities.multi.steam.MetaTileEntitySteamOven;
 import gregtech.common.metatileentities.primitive.MetaTileEntityCharcoalPileIgniter;
-import gregtech.common.metatileentities.steam.SteamAlloySmelter;
-import gregtech.common.metatileentities.steam.SteamCompressor;
-import gregtech.common.metatileentities.steam.SteamExtractor;
-import gregtech.common.metatileentities.steam.SteamFurnace;
-import gregtech.common.metatileentities.steam.SteamHammer;
-import gregtech.common.metatileentities.steam.SteamMacerator;
-import gregtech.common.metatileentities.steam.SteamMiner;
-import gregtech.common.metatileentities.steam.SteamRockBreaker;
+import gregtech.common.metatileentities.steam.*;
 import gregtech.common.metatileentities.steam.boiler.SteamCoalBoiler;
 import gregtech.common.metatileentities.steam.boiler.SteamLavaBoiler;
 import gregtech.common.metatileentities.steam.boiler.SteamSolarBoiler;
 import gregtech.common.metatileentities.steam.multiblockpart.MetaTileEntitySteamHatch;
 import gregtech.common.metatileentities.steam.multiblockpart.MetaTileEntitySteamItemBus;
-import gregtech.common.metatileentities.storage.MetaTileEntityBuffer;
-import gregtech.common.metatileentities.storage.MetaTileEntityCrate;
-import gregtech.common.metatileentities.storage.MetaTileEntityCreativeChest;
-import gregtech.common.metatileentities.storage.MetaTileEntityCreativeEnergy;
-import gregtech.common.metatileentities.storage.MetaTileEntityCreativeTank;
-import gregtech.common.metatileentities.storage.MetaTileEntityDrum;
-import gregtech.common.metatileentities.storage.MetaTileEntityQuantumChest;
-import gregtech.common.metatileentities.storage.MetaTileEntityQuantumExtender;
-import gregtech.common.metatileentities.storage.MetaTileEntityQuantumProxy;
-import gregtech.common.metatileentities.storage.MetaTileEntityQuantumStorageController;
-import gregtech.common.metatileentities.storage.MetaTileEntityQuantumTank;
-import gregtech.common.metatileentities.storage.MetaTileEntityWorkbench;
+import gregtech.common.metatileentities.storage.*;
 import gregtech.common.pipelike.fluidpipe.longdistance.MetaTileEntityLDFluidEndpoint;
 import gregtech.common.pipelike.itempipe.longdistance.MetaTileEntityLDItemEndpoint;
 import gregtech.integration.jei.multiblock.MultiblockInfoCategory;
 
 import net.minecraft.util.ResourceLocation;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -232,9 +143,6 @@ public class MetaTileEntities {
     public static final MetaTileEntityRotorHolder[] ROTOR_HOLDER = new MetaTileEntityRotorHolder[6]; // HV, EV, IV, LuV, ZPM, UV
     public static final MetaTileEntityMufflerHatch[] MUFFLER_HATCH = new MetaTileEntityMufflerHatch[GTValues.UV + 1]; // LV-UV
     public static final MetaTileEntityFusionReactor[] FUSION_REACTOR = new MetaTileEntityFusionReactor[3];
-    public static MetaTileEntityQuantumStorageController QUANTUM_STORAGE_CONTROLLER;
-    public static MetaTileEntityQuantumProxy QUANTUM_STORAGE_PROXY;
-    public static MetaTileEntityQuantumExtender QUANTUM_STORAGE_EXTENDER;
     public static final MetaTileEntityQuantumChest[] QUANTUM_CHEST = new MetaTileEntityQuantumChest[10];
     public static final MetaTileEntityQuantumTank[] QUANTUM_TANK = new MetaTileEntityQuantumTank[10];
     public static final MetaTileEntityBuffer[] BUFFER = new MetaTileEntityBuffer[3];
@@ -347,6 +255,7 @@ public class MetaTileEntities {
     public static MetaTileEntityActiveTransformer ACTIVE_TRANSFORMER;
 
     // STORAGE SECTION
+    public static MetaTileEntityLockedSafe LOCKED_SAFE;
     public static MetaTileEntityTankValve WOODEN_TANK_VALVE;
     public static MetaTileEntityTankValve STEEL_TANK_VALVE;
     public static MetaTileEntityMultiblockTank WOODEN_TANK;
@@ -614,7 +523,7 @@ public class MetaTileEntities {
 
         // Circuit Assembler, IDs 650-664
         registerSimpleMetaTileEntity(CIRCUIT_ASSEMBLER, 635, "circuit_assembler", RecipeMaps.CIRCUIT_ASSEMBLER_RECIPES,
-                Textures.CIRCUIT_ASSEMBLER_OVERLAY, true, GTUtility.hvCappedTankSizeFunction);
+                Textures.ASSEMBLER_OVERLAY, true, GTUtility.hvCappedTankSizeFunction);
 
         // Rock Breaker, IDs 665-679
         registerMetaTileEntities(ROCK_BREAKER, 665, "rock_breaker",
@@ -990,14 +899,6 @@ public class MetaTileEntities {
         PUMP[2] = registerMetaTileEntity(1532, new MetaTileEntityPump(gregtechId("pump.hv"), 3));
         PUMP[3] = registerMetaTileEntity(1533, new MetaTileEntityPump(gregtechId("pump.ev"), 4));
 
-        // Quantum Storage Network 1757 - 1759
-        QUANTUM_STORAGE_CONTROLLER = registerMetaTileEntity(1757,
-                new MetaTileEntityQuantumStorageController(gregtechId("quantum_storage_controller")));
-        QUANTUM_STORAGE_PROXY = registerMetaTileEntity(1758,
-                new MetaTileEntityQuantumProxy(gregtechId("quantum_storage_proxy")));
-        QUANTUM_STORAGE_EXTENDER = registerMetaTileEntity(1759,
-                new MetaTileEntityQuantumExtender(gregtechId("quantum_storage_extender")));
-
         // Super / Quantum Chests, IDs 1560-1574
         for (int i = 0; i < 5; i++) {
             String voltageName = GTValues.VN[i + 1].toLowerCase();
@@ -1066,19 +967,19 @@ public class MetaTileEntities {
 
         // Crates, IDs 1625-1639
         WOODEN_CRATE = registerMetaTileEntity(1625,
-                new MetaTileEntityCrate(gregtechId("crate.wood"), Materials.Wood, 27, 9));
+                new MetaTileEntityCrate(gregtechId("crate.wood"), Materials.Wood, 27));
         BRONZE_CRATE = registerMetaTileEntity(1626,
-                new MetaTileEntityCrate(gregtechId("crate.bronze"), Materials.Bronze, 54, 9));
+                new MetaTileEntityCrate(gregtechId("crate.bronze"), Materials.Bronze, 54));
         STEEL_CRATE = registerMetaTileEntity(1627,
-                new MetaTileEntityCrate(gregtechId("crate.steel"), Materials.Steel, 72, 9));
+                new MetaTileEntityCrate(gregtechId("crate.steel"), Materials.Steel, 72));
         ALUMINIUM_CRATE = registerMetaTileEntity(1628,
-                new MetaTileEntityCrate(gregtechId("crate.aluminium"), Materials.Aluminium, 90, 10));
+                new MetaTileEntityCrate(gregtechId("crate.aluminium"), Materials.Aluminium, 90));
         STAINLESS_STEEL_CRATE = registerMetaTileEntity(1629,
-                new MetaTileEntityCrate(gregtechId("crate.stainless_steel"), Materials.StainlessSteel, 108, 12));
+                new MetaTileEntityCrate(gregtechId("crate.stainless_steel"), Materials.StainlessSteel, 108));
         TITANIUM_CRATE = registerMetaTileEntity(1630,
-                new MetaTileEntityCrate(gregtechId("crate.titanium"), Materials.Titanium, 126, 14));
+                new MetaTileEntityCrate(gregtechId("crate.titanium"), Materials.Titanium, 126));
         TUNGSTENSTEEL_CRATE = registerMetaTileEntity(1631,
-                new MetaTileEntityCrate(gregtechId("crate.tungstensteel"), Materials.TungstenSteel, 144, 16));
+                new MetaTileEntityCrate(gregtechId("crate.tungstensteel"), Materials.TungstenSteel, 144));
 
         // Rotor Holder, IDs 1640-1645
         ROTOR_HOLDER[0] = registerMetaTileEntity(1640,
@@ -1095,6 +996,7 @@ public class MetaTileEntities {
                 new MetaTileEntityRotorHolder(gregtechId("rotor_holder.uv"), GTValues.UV));
 
         // Misc, IDs 1646-1999
+        LOCKED_SAFE = registerMetaTileEntity(1646, new MetaTileEntityLockedSafe(gregtechId("locked_safe")));
         WORKBENCH = registerMetaTileEntity(1647, new MetaTileEntityWorkbench(gregtechId("workbench")));
         PRIMITIVE_WATER_PUMP = registerMetaTileEntity(1648,
                 new MetaTileEntityPrimitiveWaterPump(gregtechId("primitive_water_pump")));
@@ -1201,14 +1103,6 @@ public class MetaTileEntities {
                     new MetaTileEntityMultiFluidHatch(gregtechId("fluid_hatch.export_9x." + tierName), i, 9, true));
         }
 
-        registerMetaTileEntity(1900, new MTEFissionReactor(gregtechId("fission_reactor")));
-        registerMetaTileEntity(1901, new MTEEmptyFissionComponent(gregtechId("empty_fission_component")));
-        registerMetaTileEntity(1902, new MTEControlRod(gregtechId("control_rod")));
-        registerMetaTileEntity(1903, new MTECoolantChannel(gregtechId("coolant_channel")));
-        registerMetaTileEntity(1904, new MTEFissionFuel(gregtechId("fission_fuel")));
-        registerMetaTileEntity(1905, new MTEModerator(gregtechId("neutron_moderator")));
-        registerMetaTileEntity(1906, new MTENeutronReflector(gregtechId("neutron_reflector")));
-
         /*
          * FOR ADDON DEVELOPERS:
          *
@@ -1284,26 +1178,17 @@ public class MetaTileEntities {
         }
     }
 
-    /**
-     * Register a MetaTileEntity
-     *
-     * @param id  the numeric ID to use as item metadata
-     * @param mte the MTE to register
-     * @return the MTE
-     * @param <T> the MTE class
-     */
-    public static <T extends MetaTileEntity> @NotNull T registerMetaTileEntity(int id, @NotNull T mte) {
-        if (mte instanceof IMultiblockAbilityPart<?>abilityPart) {
-            MultiblockAbility.registerMultiblockAbility(abilityPart.getAbility(), mte);
+    public static <T extends MetaTileEntity> T registerMetaTileEntity(int id, T sampleMetaTileEntity) {
+        if (sampleMetaTileEntity instanceof IMultiblockAbilityPart abilityPart) {
+            MultiblockAbility.registerMultiblockAbility(abilityPart.getAbility(), sampleMetaTileEntity);
         }
-
-        if (Mods.JustEnoughItems.isModLoaded() && mte instanceof MultiblockControllerBase controller &&
-                controller.shouldShowInJei()) {
-            MultiblockInfoCategory.registerMultiblock(controller);
+        if (sampleMetaTileEntity instanceof MultiblockControllerBase && Mods.JustEnoughItems.isModLoaded()) {
+            if (((MultiblockControllerBase) sampleMetaTileEntity).shouldShowInJei()) {
+                MultiblockInfoCategory.registerMultiblock((MultiblockControllerBase) sampleMetaTileEntity);
+            }
         }
-
-        mte.getRegistry().register(id, mte.metaTileEntityId, mte);
-        return mte;
+        GregTechAPI.MTE_REGISTRY.register(id, sampleMetaTileEntity.metaTileEntityId, sampleMetaTileEntity);
+        return sampleMetaTileEntity;
     }
 
     @SuppressWarnings("unused")

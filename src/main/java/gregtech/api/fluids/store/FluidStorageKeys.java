@@ -27,7 +27,7 @@ public final class FluidStorageKeys {
                 }
 
                 FluidProperty property = m.getProperty(PropertyKey.FLUID);
-                if (m.isElement() || property == null || property.getPrimaryKey() != FluidStorageKeys.GAS) {
+                if (m.isElement() || (property != null && property.getPrimaryKey() != FluidStorageKeys.LIQUID)) {
                     return "gregtech.fluid.gas_generic";
                 }
                 return "gregtech.fluid.generic";
@@ -43,15 +43,13 @@ public final class FluidStorageKeys {
     private FluidStorageKeys() {}
 
     /**
-     * Used to create registry names for fluids that only have a prefix when not stored by the primary key.
-     *
      * @param prefix   the prefix string for the registry name
      * @param key      the key which does not require the prefix
      * @param material the material to create a registry name for
      * @return the registry name
      */
-    public static @NotNull String prefixedRegistryName(@NotNull String prefix, @NotNull FluidStorageKey key,
-                                                       @NotNull Material material) {
+    private static @NotNull String prefixedRegistryName(@NotNull String prefix, @NotNull FluidStorageKey key,
+                                                        @NotNull Material material) {
         FluidProperty property = material.getProperty(PropertyKey.FLUID);
         if (property != null && property.getPrimaryKey() != key) {
             return prefix + material.getName();

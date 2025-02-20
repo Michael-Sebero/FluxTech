@@ -5,7 +5,6 @@ import gregtech.api.capability.IMultipleTankHandler;
 import gregtech.api.metatileentity.multiblock.RecipeMapSteamMultiblockController;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.RecipeMap;
-import gregtech.api.util.GTUtility;
 import gregtech.common.ConfigHolder;
 
 import net.minecraft.block.Block;
@@ -23,7 +22,6 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class SteamMultiblockRecipeLogic extends AbstractRecipeLogic {
 
@@ -106,9 +104,9 @@ public class SteamMultiblockRecipeLogic extends AbstractRecipeLogic {
     }
 
     @Override
-    protected boolean drawEnergy(long recipeEUt, boolean simulate) {
+    protected boolean drawEnergy(int recipeEUt, boolean simulate) {
         combineSteamTanks();
-        int resultDraw = GTUtility.safeCastLongToInt((long) Math.ceil(recipeEUt / conversionRate));
+        int resultDraw = (int) Math.ceil(recipeEUt / conversionRate);
         return resultDraw >= 0 && steamFluidTankCombined.getFluidAmount() >= resultDraw &&
                 steamFluidTank.drain(resultDraw, !simulate) != null;
     }
@@ -124,17 +122,14 @@ public class SteamMultiblockRecipeLogic extends AbstractRecipeLogic {
     }
 
     @Override
-    protected @Nullable Recipe setupAndConsumeRecipeInputs(@NotNull Recipe recipe,
-                                                           @NotNull IItemHandlerModifiable importInventory) {
+    protected boolean setupAndConsumeRecipeInputs(@NotNull Recipe recipe,
+                                                  @NotNull IItemHandlerModifiable importInventory) {
         RecipeMapSteamMultiblockController controller = (RecipeMapSteamMultiblockController) metaTileEntity;
-        if (controller.checkRecipe(recipe, false)) {
-            recipe = super.setupAndConsumeRecipeInputs(recipe, importInventory);
-            if (recipe != null) {
-                controller.checkRecipe(recipe, true);
-                return recipe;
-            }
-        }
-        return null;
+        if (controller.checkRecipe(recipe, false) &&
+                super.setupAndConsumeRecipeInputs(recipe, importInventory)) {
+            controller.checkRecipe(recipe, true);
+            return true;
+        } else return false;
     }
 
     @Override
@@ -174,8 +169,8 @@ public class SteamMultiblockRecipeLogic extends AbstractRecipeLogic {
     }
 
     @Override
-    protected boolean hasEnoughPower(long eut, int duration) {
-        long totalSteam = (long) (eut * duration / conversionRate);
+    protected boolean hasEnoughPower(int @NotNull [] resultOverclock) {
+        int totalSteam = (int) (resultOverclock[0] * resultOverclock[1] / conversionRate);
         if (totalSteam > 0) {
             long steamStored = getEnergyStored();
             long steamCapacity = getEnergyCapacity();
@@ -187,6 +182,6 @@ public class SteamMultiblockRecipeLogic extends AbstractRecipeLogic {
             return steamStored >= totalSteam;
         }
         // generation case unchanged
-        return super.hasEnoughPower(eut, duration);
+        return super.hasEnoughPower(resultOverclock);
     }
 }

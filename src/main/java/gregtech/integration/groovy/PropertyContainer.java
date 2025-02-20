@@ -42,6 +42,6 @@ public class PropertyContainer extends GroovyPropertyContainer {
     }
 
     public void lateMaterialEvent(Closure<?> eventListener) {
-        lateMaterialEvent(EventPriority.NORMAL, eventListener);
+        materialEvent(EventPriority.NORMAL, eventListener);
     }
 }

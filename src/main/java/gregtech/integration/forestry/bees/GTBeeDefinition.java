@@ -890,7 +890,7 @@ public enum GTBeeDefinition implements IBeeDefinition {
             },
             dis -> {
                 IBeeMutationBuilder mutation = dis.registerMutation(BeeDefinition.AVENGING, PLATINUM, 2);
-                mutation.addMutationCondition(new MaterialMutationCondition(Uranium));
+                mutation.addMutationCondition(new MaterialMutationCondition(Uranium238));
             }),
     PLUTONIUM(GTBranchDefinition.GT_RADIOACTIVE, "Plutos", true, 0x570000, 0x240000,
             beeSpecies -> {
