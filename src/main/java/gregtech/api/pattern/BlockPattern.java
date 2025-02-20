@@ -268,13 +268,13 @@ public class BlockPattern {
                                 if (limit.minLayerCount > 0) {
                                     if (!cacheLayer.containsKey(limit)) {
                                         cacheLayer.put(limit, 1);
-                                    } else
-                                        if (cacheLayer.get(limit) < limit.minLayerCount && (limit.maxLayerCount == -1 ||
-                                                cacheLayer.get(limit) < limit.maxLayerCount)) {
-                                                    cacheLayer.put(limit, cacheLayer.get(limit) + 1);
-                                                } else {
-                                                    continue;
-                                                }
+                                    } else if (cacheLayer.get(limit) < limit.minLayerCount &&
+                                            (limit.maxLayerCount == -1 ||
+                                                    cacheLayer.get(limit) < limit.maxLayerCount)) {
+                                                        cacheLayer.put(limit, cacheLayer.get(limit) + 1);
+                                                    } else {
+                                                        continue;
+                                                    }
                                 } else {
                                     continue;
                                 }
@@ -403,9 +403,10 @@ public class BlockPattern {
                 z++;
             }
         }
-        EnumFacing[] facings = ArrayUtils.addAll(new EnumFacing[] { controllerBase.getFrontFacing() }, FACINGS); // follow
-                                                                                                                 // controller
-                                                                                                                 // first
+        EnumFacing[] facings = ArrayUtils.addAll(new EnumFacing[] { controllerBase.getFrontFacing() },
+                FACINGS); // follow
+        // controller
+        // first
         blocks.forEach((pos, block) -> { // adjust facing
             if (block instanceof MetaTileEntity) {
                 MetaTileEntity metaTileEntity = (MetaTileEntity) block;
@@ -451,7 +452,7 @@ public class BlockPattern {
                         boolean find = false;
                         BlockInfo[] infos = null;
                         for (TraceabilityPredicate.SimplePredicate limit : predicate.limited) { // check layer and
-                                                                                                // previewCount
+                            // previewCount
                             if (limit.minLayerCount > 0) {
                                 if (!cacheLayer.containsKey(limit)) {
                                     cacheLayer.put(limit, 1);

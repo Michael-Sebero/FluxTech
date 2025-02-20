@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import static gregtech.api.util.RelativeDirection.*;
@@ -38,12 +37,11 @@ public class MultiblockShapeInfo {
     }
 
     public static Builder builder() {
-        return builder(RIGHT, DOWN, BACK);
+        return new Builder(RIGHT, DOWN, BACK);
     }
 
-    public static Builder builder(@NotNull RelativeDirection... structureDir) {
-        if (structureDir.length != 3) throw new IllegalArgumentException("Must have exactly 3 directions!");
-        return new Builder(structureDir[0], structureDir[1], structureDir[2]);
+    public static Builder builder(RelativeDirection... structureDir) {
+        return new Builder(structureDir);
     }
 
     public static class Builder {
@@ -53,22 +51,10 @@ public class MultiblockShapeInfo {
         private List<String[]> shape = new ArrayList<>();
         private Map<Character, BlockInfo> symbolMap = new HashMap<>();
 
-        /**
-         * Use {@link #builder(RelativeDirection...)}
-         * 
-         * @param structureDir The directions that the provided block pattern is based upon (character, string, row).
-         */
-        @Deprecated
-        public Builder(@NotNull RelativeDirection... structureDir) {
-            this(structureDir[0], structureDir[1], structureDir[2]);
-        }
-
-        @Deprecated
-        public Builder(@NotNull RelativeDirection one, @NotNull RelativeDirection two,
-                       @NotNull RelativeDirection three) {
-            this.structureDir[0] = Objects.requireNonNull(one);
-            this.structureDir[1] = Objects.requireNonNull(two);
-            this.structureDir[2] = Objects.requireNonNull(three);
+        public Builder(RelativeDirection... structureDir) {
+            this.structureDir[0] = structureDir[0];
+            this.structureDir[1] = structureDir[1];
+            this.structureDir[2] = structureDir[2];
             int flags = 0;
             for (int i = 0; i < this.structureDir.length; i++) {
                 switch (structureDir[i]) {
@@ -77,7 +63,7 @@ public class MultiblockShapeInfo {
                     case FRONT, BACK -> flags |= 0x4;
                 }
             }
-            if (flags != 0x7) throw new IllegalArgumentException("The directions must be on different axes!");
+            if (flags != 0x7) throw new IllegalArgumentException("Must have 3 different axes!");
         }
 
         public Builder aisle(String... data) {

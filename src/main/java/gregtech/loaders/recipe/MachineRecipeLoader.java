@@ -830,6 +830,59 @@ public class MachineRecipeLoader {
                         ConfigHolder.recipes.casingsPerCraft))
                 .duration(200).buildAndRegister();
 
+        ASSEMBLER_RECIPES.recipeBuilder().EUt(48).duration(280)
+                .input(plateDouble, Inconel)
+                .input(plate, Steel, 5)
+                .input(frameGt, Steel)
+                .outputs(MetaBlocks.FISSION_CASING.getItemVariant(
+                        BlockFissionCasing.FissionCasingType.REACTOR_VESSEL, ConfigHolder.recipes.casingsPerCraft))
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder().EUt(48).duration(280)
+                .input(pipeLargeFluid, Inconel)
+                .input(frameGt, Steel)
+                .outputs(MetaBlocks.FISSION_CASING.getItemVariant(
+                        BlockFissionCasing.FissionCasingType.COOLANT_CHANNEL))
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder().EUt(48).duration(280)
+                .input(stick, Zircaloy, 6)
+                .input(ring, Zircaloy, 1)
+                .circuitMeta(1)
+                .outputs(MetaBlocks.FISSION_CASING.getItemVariant(
+                        BlockFissionCasing.FissionCasingType.FUEL_CHANNEL))
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder().EUt(48).duration(280)
+                .input(stick, Zircaloy, 3)
+                .input(ring, Zircaloy, 1)
+                .circuitMeta(2)
+                .outputs(MetaBlocks.FISSION_CASING.getItemVariant(
+                        BlockFissionCasing.FissionCasingType.CONTROL_ROD_CHANNEL))
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder().EUt(48).duration(200)
+                .inputs(MetaBlocks.BOILER_CASING.getItemVariant(
+                        BlockBoilerCasing.BoilerCasingType.POLYTETRAFLUOROETHYLENE_PIPE))
+                .input(wireGtSingle, Nichrome, 4)
+                .outputs(MetaBlocks.NUCLEAR_CASING.getItemVariant(
+                        BlockNuclearCasing.NuclearCasingType.GAS_CENTRIFUGE_HEATER))
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder().EUt(48).duration(200)
+                .input(pipeNormalFluid, Steel)
+                .input(pipeTinyFluid, Steel, 3)
+                .outputs(MetaBlocks.GAS_CENTRIFUGE_CASING.getItemVariant(
+                        BlockGasCentrifugeCasing.GasCentrifugeCasingType.GAS_CENTRIFUGE_COLUMN))
+                .buildAndRegister();
+
+        ASSEMBLER_RECIPES.recipeBuilder().EUt(64).duration(200)
+                .input(stick, BoronCarbide, 8)
+                .outputs(
+                        MetaBlocks.NUCLEAR_CASING.getItemVariant(BlockNuclearCasing.NuclearCasingType.SPENT_FUEL_CASING,
+                                ConfigHolder.recipes.casingsPerCraft))
+                .buildAndRegister();
+
         // If these recipes are changed, change the values in MaterialInfoLoader.java
 
         RecipeMaps.ASSEMBLER_RECIPES.recipeBuilder().duration(25).EUt(16)
@@ -1029,6 +1082,25 @@ public class MachineRecipeLoader {
         BLAST_RECIPES.recipeBuilder().duration(320).EUt(100).input(gem, Sapphire).output(nugget, Aluminium, 3)
                 .blastFurnaceTemp(1200).buildAndRegister();
 
+        // Titanium tetrachloride
+        BLAST_RECIPES.recipeBuilder().duration(800).EUt(VA[HV])
+                .input(dust, Magnesium, 2)
+                .fluidInputs(TitaniumTetrachloride.getFluid(1000))
+                .output(ingotHot, Titanium)
+                .output(dust, MagnesiumChloride, 6)
+                .blastFurnaceTemp(Titanium.getBlastTemperature() + 200)
+                .buildAndRegister();
+
+        // Rutile from ilmenite
+        BLAST_RECIPES.recipeBuilder()
+                .input(dust, Ilmenite, 10)
+                .input(dust, Carbon, 4)
+                .output(ingot, WroughtIron, 2)
+                .output(dust, Rutile, 4)
+                .fluidOutputs(CarbonDioxide.getFluid(2000))
+                .blastFurnaceTemp(1700)
+                .duration(1600).EUt(VA[HV]).buildAndRegister();
+
         // Tempered Glass
         BLAST_RECIPES.recipeBuilder()
                 .input(block, Glass)
@@ -1108,17 +1180,17 @@ public class MachineRecipeLoader {
                 .buildAndRegister();
 
         EXTRACTOR_RECIPES.recipeBuilder().duration(300).EUt(2)
-                .inputs(new ItemStack(Blocks.LEAVES, 16, 3))
+                .inputs(new ItemStack(MetaBlocks.RUBBER_LEAVES, 16))
                 .output(dust, RawRubber)
                 .buildAndRegister();
 
         EXTRACTOR_RECIPES.recipeBuilder().duration(300).EUt(2)
-                .inputs(new ItemStack(Blocks.LOG, 1, 3))
+                .inputs(new ItemStack(MetaBlocks.RUBBER_LOG))
                 .output(dust, RawRubber)
                 .buildAndRegister();
 
         EXTRACTOR_RECIPES.recipeBuilder().duration(300).EUt(2)
-                .inputs(new ItemStack(Blocks.SAPLING, 3, 3))
+                .inputs(new ItemStack(MetaBlocks.RUBBER_SAPLING))
                 .output(dust, RawRubber)
                 .buildAndRegister();
 
@@ -1195,7 +1267,7 @@ public class MachineRecipeLoader {
         MACERATOR_RECIPES.recipeBuilder()
                 .input(stone, GraniteRed)
                 .output(dust, GraniteRed)
-                .chancedOutput(dust, Uranium, 10, 5)
+                .chancedOutput(dust, Uraninite, 10, 5)
                 .buildAndRegister();
 
         MACERATOR_RECIPES.recipeBuilder()

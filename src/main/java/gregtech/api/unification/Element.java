@@ -34,8 +34,8 @@ public class Element {
      * @param name            Name of the Element
      * @param symbol          Symbol of the Element
      */
-    protected Element(long protons, long neutrons, double halfLifeSeconds, String decayTo, String name, String symbol,
-                      boolean isIsotope) {
+    public Element(long protons, long neutrons, double halfLifeSeconds, String decayTo, String name, String symbol,
+                   boolean isIsotope) {
         this.protons = protons;
         this.neutrons = neutrons;
         this.halfLifeSeconds = halfLifeSeconds;
@@ -73,6 +73,6 @@ public class Element {
     @Override
     @ZenMethod
     public String toString() {
-        return name;
+        return super.toString();
     }
 }
