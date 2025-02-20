@@ -25,21 +25,21 @@ public class SliderWidget extends Widget {
     public static final BiFunction<String, Float, String> DEFAULT_TEXT_SUPPLIER = (name, value) -> I18n.format(name,
             value.intValue());
 
-    protected int sliderWidth = 8;
-    protected TextureArea backgroundArea = GuiTextures.SLIDER_BACKGROUND;
-    protected TextureArea sliderIcon = GuiTextures.SLIDER_ICON;
+    private int sliderWidth = 8;
+    private TextureArea backgroundArea = GuiTextures.SLIDER_BACKGROUND;
+    private TextureArea sliderIcon = GuiTextures.SLIDER_ICON;
     private final BiFunction<String, Float, String> textSupplier = DEFAULT_TEXT_SUPPLIER;
-    protected int textColor = 0xFFFFFF;
+    private int textColor = 0xFFFFFF;
 
-    protected final float min;
-    protected final float max;
+    private final float min;
+    private final float max;
     private final String name;
 
     private final FloatConsumer responder;
     private boolean isPositionSent;
 
-    protected String displayString;
-    protected float sliderPosition;
+    private String displayString;
+    private float sliderPosition;
     public boolean isMouseDown;
 
     public SliderWidget(String name, int xPosition, int yPosition, int width, int height, float min, float max,

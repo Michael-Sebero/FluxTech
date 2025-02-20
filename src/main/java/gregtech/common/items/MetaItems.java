@@ -564,10 +564,6 @@ public final class MetaItems {
 
     public static MetaItem<?>.MetaValueItem MULTIBLOCK_BUILDER;
 
-    // Nuclear
-    public static MetaItem<?>.MetaValueItem ANODE_BASKET;
-    public static MetaItem<?>.MetaValueItem FUEL_CLADDING;
-
     private static final List<OrePrefix> orePrefixes = new ArrayList<>();
 
     static {
@@ -610,14 +606,6 @@ public final class MetaItems {
         orePrefixes.add(OrePrefix.toolHeadWrench);
         orePrefixes.add(OrePrefix.toolHeadBuzzSaw);
         orePrefixes.add(OrePrefix.toolHeadScrewdriver);
-        orePrefixes.add(OrePrefix.fuelRod);
-        orePrefixes.add(OrePrefix.fuelRodDepleted);
-        orePrefixes.add(OrePrefix.fuelRodHotDepleted);
-        orePrefixes.add(OrePrefix.fuelPellet);
-        orePrefixes.add(OrePrefix.fuelPelletDepleted);
-        orePrefixes.add(OrePrefix.dustSpentFuel);
-        orePrefixes.add(OrePrefix.dustBredFuel);
-        orePrefixes.add(OrePrefix.dustFissionByproduct);
     }
 
     public static void init() {

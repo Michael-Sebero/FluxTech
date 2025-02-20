@@ -200,10 +200,6 @@ public class Materials {
     public static Material Neodymium;
     public static Material Neon;
     public static Material Neptunium;
-    public static Material Neptunium235;
-    public static Material Neptunium236;
-    public static Material Neptunium237;
-    public static Material Neptunium239;
     public static Material Nickel;
     public static Material Nihonium;
     public static Material Niobium;
@@ -217,12 +213,8 @@ public class Materials {
     public static Material Polonium;
     public static Material Platinum;
     public static Material Plutonium;
-    public static Material Plutonium238;
     public static Material Plutonium239;
-    public static Material Plutonium240;
     public static Material Plutonium241;
-    public static Material Plutonium242;
-    public static Material Plutonium244;
     public static Material Potassium;
     public static Material Praseodymium;
     public static Material Promethium;
@@ -257,9 +249,8 @@ public class Materials {
     public static Material Tritium;
     public static Material Tungsten;
     public static Material Uranium;
-    public static Material Uranium235;
     public static Material Uranium238;
-    public static Material Uranium239;
+    public static Material Uranium235;
     public static Material Vanadium;
     public static Material Xenon;
     public static Material Ytterbium;
@@ -439,10 +430,8 @@ public class Materials {
     public static Material NitricOxide;
     public static Material Iron3Chloride;
     public static Material UraniumHexafluoride;
-    public static Material HighEnrichedUraniumHexafluoride;
-    public static Material LowEnrichedUraniumHexafluoride;
+    public static Material EnrichedUraniumHexafluoride;
     public static Material DepletedUraniumHexafluoride;
-    public static Material LowEnrichedUraniumDioxide;
     public static Material NitrousOxide;
     public static Material EnderPearl;
     public static Material PotassiumFeldspar;
@@ -480,21 +469,14 @@ public class Materials {
     public static Material NaquadriaSulfate;
     public static Material Pyrochlore;
     public static Material RTMAlloy;
-    public static Material HighEnrichedUraniumDioxide;
-    public static Material DepletedUraniumDioxide;
-    public static Material HighPressureSteam;
-    public static Material FissilePlutoniumDioxide;
-    public static Material Zircaloy;
+    public static Material IlmeniteSlag;
     public static Material Zircon;
-    public static Material ZirconiumDioxide;
+    public static Material Zirconia;
     public static Material ZirconiumTetrachloride;
-    public static Material HafniumDioxide;
+    public static Material Hafnia;
     public static Material HafniumTetrachloride;
-    public static Material Inconel;
-    public static Material BoronTrioxide;
-    public static Material BoronCarbide;
-    public static Material HeavyWater;
-    public static Material HighPressureHeavyWater;
+    public static Material Zircaloy4;
+    public static Material Inconel718;
 
     /**
      * Organic chemistry
@@ -710,9 +692,11 @@ public class Materials {
     public static Material Lapotron;
     public static Material UUMatter;
     public static Material PCBCoolant;
-    public static Material Corium;
-    public static Material SpentUraniumFuelSolution;
-    public static Material RadonRichGasMixture;
+    public static Material BauxiteSlurry;
+    public static Material CrackedBauxiteSlurry;
+    public static Material BauxiteSludge;
+    public static Material DecalcifiedBauxiteSludge;
+    public static Material BauxiteSlag;
 
     /**
      * Second Degree Compounds
@@ -770,10 +754,6 @@ public class Materials {
     public static Material SaltWater;
     public static Material Clay;
     public static Material Redstone;
-    public static Material LEU235;
-    public static Material HEU235;
-    public static Material LowGradeMOX;
-    public static Material HighGradeMOX;
 
     /**
      * Third Degree Materials

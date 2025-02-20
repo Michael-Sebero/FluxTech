@@ -331,9 +331,4 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
             lines.add(I18n.format("metaarmor.tooltip.jump"));
         }
     }
-
-    @Override
-    public float getRadiationResistance() {
-        return 0.25f;
-    }
 }

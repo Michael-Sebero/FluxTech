@@ -32,9 +32,18 @@ public class FactoryBlockPattern {
         int flags = 0;
         for (int i = 0; i < this.structureDir.length; i++) {
             switch (structureDir[i]) {
-                case UP, DOWN -> flags |= 0x1;
-                case LEFT, RIGHT -> flags |= 0x2;
-                case FRONT, BACK -> flags |= 0x4;
+                case UP:
+                case DOWN:
+                    flags |= 0x1;
+                    break;
+                case LEFT:
+                case RIGHT:
+                    flags |= 0x2;
+                    break;
+                case FRONT:
+                case BACK:
+                    flags |= 0x4;
+                    break;
             }
         }
         if (flags != 0x7) throw new IllegalArgumentException("Must have 3 different axes!");

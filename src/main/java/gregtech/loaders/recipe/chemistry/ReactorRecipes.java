@@ -573,9 +573,10 @@ public class ReactorRecipes {
                 .duration(264).EUt(60).buildAndRegister();
 
         LARGE_CHEMICAL_RECIPES.recipeBuilder()
-                .input(dust, Plutonium240, 8)
+                .input(ingot, Plutonium239, 8)
+                .input(dust, Uranium238)
                 .fluidInputs(Air.getFluid(10000))
-                .output(dust, Thorium, 8)
+                .output(dust, Plutonium239, 8)
                 .fluidOutputs(Radon.getFluid(1000))
                 .duration(4000).EUt(VA[HV]).buildAndRegister();
 
@@ -675,11 +676,5 @@ public class ReactorRecipes {
                 .fluidOutputs(PolychlorinatedBiphenyl.getFluid(1000))
                 .fluidOutputs(HydrochloricAcid.getFluid(2000))
                 .duration(200).EUt(VH[HV]).buildAndRegister();
-
-        CHEMICAL_RECIPES.recipeBuilder()
-                .fluidInputs(Deuterium.getFluid(2000))
-                .fluidInputs(Oxygen.getFluid(1000))
-                .fluidOutputs(HeavyWater.getFluid(1000))
-                .duration(200).EUt(VH[LV]).buildAndRegister();
     }
 }

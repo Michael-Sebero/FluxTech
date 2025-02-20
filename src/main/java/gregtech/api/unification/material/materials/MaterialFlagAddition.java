@@ -1,7 +1,5 @@
 package gregtech.api.unification.material.materials;
 
-import gregtech.api.fluids.store.FluidStorageKeys;
-import gregtech.api.unification.material.properties.CoolantProperty;
 import gregtech.api.unification.material.properties.OreProperty;
 import gregtech.api.unification.material.properties.PropertyKey;
 
@@ -163,8 +161,9 @@ public class MaterialFlagAddition {
         oreProp.setOreByProducts(GarnetYellow, Calcium);
 
         oreProp = Ilmenite.getProperty(PropertyKey.ORE);
-        oreProp.setOreByProducts(Iron, Rutile);
+        oreProp.setOreByProducts(Iron, Rutile, Rutile, IlmeniteSlag);
         oreProp.setSeparatedInto(Iron);
+        oreProp.setWashedIn(SodiumPersulfate);
 
         oreProp = Bauxite.getProperty(PropertyKey.ORE);
         oreProp.setOreByProducts(Grossular, Rutile, Gallium);
@@ -404,18 +403,7 @@ public class MaterialFlagAddition {
         oreProp = Pyrochlore.getProperty(PropertyKey.ORE);
         oreProp.setOreByProducts(Apatite, Calcium, Niobium);
 
-        /**
-         * Coolant property addition
-         * This sometimes cross-references materials
-         */
-        DistilledWater.setProperty(PropertyKey.COOLANT,
-                new CoolantProperty(DistilledWater, HighPressureSteam, FluidStorageKeys.LIQUID, 1., 1000,
-                        373, 2260000, 4168.)
-                                .setAccumulatesHydrogen(true));
-
-        HeavyWater.setProperty(PropertyKey.COOLANT,
-                new CoolantProperty(HeavyWater, HighPressureHeavyWater, FluidStorageKeys.LIQUID, 4., 1000,
-                        374.4, 2064000, 4228.)
-                                .setAccumulatesHydrogen(true));
+        oreProp = Zircon.getProperty(PropertyKey.ORE);
+        oreProp.setOreByProducts(Zircon, Ilmenite, Rutile);
     }
 }

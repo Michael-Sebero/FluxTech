@@ -153,9 +153,6 @@ public class GregtechDataCodes {
     public static final int LOCK_OBJECT_HOLDER = assignId();
     public static final int CACHED_CWU = assignId();
 
-    // Fission Hatches
-    public static final int FISSION_LOCK_UPDATE = assignId();
-
     // NBT Keys
 
     // From MetaTileEntityHolder
@@ -179,10 +176,6 @@ public class GregtechDataCodes {
     // Alarm
     public static final int UPDATE_SOUND = assignId();
     public static final int UPDATE_RADIUS = assignId();
-
-    // Fission Reactor
-    public static int SYNC_REACTOR_STATS = assignId();
-    public static int SYNC_LOCKING_STATE = assignId();
 
     // ME Parts
     public static final int UPDATE_AUTO_PULL = assignId();
