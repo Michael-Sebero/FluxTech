@@ -4,6 +4,7 @@ import gregtech.api.GTValues;
 import gregtech.api.fission.FissionReactorController;
 import gregtech.api.fission.component.FissionComponent;
 import gregtech.api.fission.component.FissionComponentData;
+import gregtech.api.metatileentity.multiblock.AbilityInstances;
 import gregtech.api.metatileentity.multiblock.IMultiblockAbilityPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiblockPart;
@@ -12,8 +13,6 @@ import net.minecraft.util.ResourceLocation;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public abstract class AbstractMTEFissionComponent<T extends FissionComponentData> extends MetaTileEntityMultiblockPart
                                                  implements FissionComponent, IMultiblockAbilityPart<FissionComponent> {
@@ -37,7 +36,9 @@ public abstract class AbstractMTEFissionComponent<T extends FissionComponentData
     }
 
     @Override
-    public final void registerAbilities(@NotNull List<FissionComponent> abilityList) {
-        abilityList.add(this);
+    public final void registerAbilities(@NotNull AbilityInstances abilityInstances) {
+        if (abilityInstances.isKey(MultiblockAbility.FISSION_COMPONENT)) {
+            abilityInstances.add(this);
+        }
     }
 }

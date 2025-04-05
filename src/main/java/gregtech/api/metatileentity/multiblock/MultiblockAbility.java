@@ -99,8 +99,8 @@ public class MultiblockAbility<T> {
     // MultiblockAbility<>("neutron_emitter");
     // public static final MultiblockAbility<ReflectorComponent> NEUTRON_REFLECTOR = new
     // MultiblockAbility<>("neutron_reflector");
-    public static final MultiblockAbility<FissionComponent> FISSION_COMPONENT = new MultiblockAbility<>(
-            "fission_component");
+    public static final MultiblockAbility<FissionComponent> FISSION_COMPONENT = ability(
+            "fission_component", FissionComponent.class);
 
     public static void registerMultiblockAbility(MultiblockAbility<?> ability, MetaTileEntity part) {
         if (!REGISTRY.containsKey(ability)) {
