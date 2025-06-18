@@ -1,7 +1,14 @@
 package gregtech.api.util.function;
 
-@FunctionalInterface
-public interface FloatSupplier {
+import java.util.function.Supplier;
 
-    float getAsFloat();
+@FunctionalInterface
+public interface FloatSupplier extends Supplier<Float> {
+
+    @Override
+    default Float get() {
+        return getFloat();
+    }
+
+    float getFloat();
 }
